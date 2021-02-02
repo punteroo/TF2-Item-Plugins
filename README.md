@@ -1,7 +1,15 @@
 # TF2 Item Management Plugins
 Some months ago I started developing private plugins for communities that modify items for the game. It **IS AGAINST TOS**, and I know this can't be released on **AlliedModders** because of such, but because **VALVe** doesn't care for their game and it's been 7 years since a token ban has been issued I'll be releasing these public.
-I might make some other releases if people want things fixed or whatever. I just release them because keeping them private is worthless, they're already everywhere.
-Feel free to use these plugins wherever you want, just don't change the author name of it and I'll thank you forever. Enjoy.
+
+I might make some other releases if people want things fixed or whatever. I just release them because keeping them private is worthless, they're already everywhere and even some other devs have made their own versions of this public as well.
+Feel free to use these plugins wherever you want, just don't change the author name of it and I'll thank you forever.
+
+If you have any doubts or want something else, just write it down on the **Issues** tab or contact me directly through **Discord**. My tag is **puntero#6566**. Enjoy.
+
+# TODO
+- [ ] Merge **vip-unusuals** with **vip-paints** to maintain functionality between them, as one removes the others' effects.
+- [ ] Implement preference saving on **vip-australium**, **vip-unusuals** and **vip-paints** so selected user effects are applied whenever the user re-joins the server. This would nullify the player from opening the menus again each map change to re-apply said preferences.
+- [ ] Fix Unusual Effects (custom or legit) not being kept after applying a custom paint effect, could probably be permanently fixed when the merge is applied.
 
 # Plugin Pack Usage
 
@@ -20,7 +28,7 @@ sm_aussie | Same as the command above, just shorter. | N/A
 
 Command | Description | Example
 ----------- | ------------- | ----------
-sm_ks | Opens up the Killstreak configuration menu. | [YouTube Video Demonstration](https://youtu.be/b8KsEIfNUyQ?t=13)
+sm_ks | Opens up the Killstreak configuration menu. Effects can be applied to each weapon individually, or activate a mode to set the same type, sheen and killstreaker on every weapon. | [YouTube Video Demonstration](https://youtu.be/b8KsEIfNUyQ?t=13)
 sm_killstreak | Same as the command above, just longer. | N/A
 sm_killstreaks | Same as the command above, just longer. | N/A
 
@@ -33,18 +41,19 @@ sm_killstreaks | Same as the command above, just longer. | N/A
 
 Command | Description | Example
 ----------- | ------------- | ----------
-sm_unu | Opens up the Unusual cosmetics configuration menu. | [YouTube Video Demonstration](https://youtu.be/b8KsEIfNUyQ?t=133)
+sm_unu | Opens up the Unusual cosmetics configuration menu. Can be applied to multiple hats and each one with a different effect. If it doesn't show up on the list it isn't compatible. | [YouTube Video Demonstration](https://youtu.be/b8KsEIfNUyQ?t=133)
 sm_unusual | Same as the command above, just longer. | N/A
 sm_inusual | Same as the command above, just longer. | N/A
 
 ## vip-paints
 * Lets players choose a custom paint color for their cosmetics. Only allows cosmetics with the ``paintable`` capability to be chosen.
 * This plugin **does not** work in conjuction with [vip-unusuals](https://github.com/punteroo/TF2-Item-Plugins/blob/production/scripting/vip-unusuals.sp) as it deletes the Unusual effect applied on the hat to replace it with paint. I might merge these 2 plugins in order to achieve full functionality, probably in a future release.
+* The paint will remove the Unusual effect present, regardless if it's from the plugin or a legit one. I'll probably fix this on a future release.
 * This plugin **supports team paints**. They're applied respectively according to your team.
 
 Command | Description | Example
 ----------- | ------------- | ----------
-sm_paint | Opens up the cosmetic painting configuration menu. | [YouTube Video Demonstration](https://www.youtube.com/watch?v=vkGS_XP9HLw)
+sm_paint | Opens up the cosmetic painting configuration menu. **Painting will remove Unusual effects if applied.** | [YouTube Video Demonstration](https://www.youtube.com/watch?v=vkGS_XP9HLw)
 
 ## vip-unusual-glow
 * Allows players to apply one of the new 'player glow' Unusual taunt effects on them permanently.
