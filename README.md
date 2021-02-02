@@ -11,6 +11,15 @@ If you have any doubts or want something else, just write it down on the **Issue
 - [ ] Implement preference saving on **vip-australium**, **vip-unusuals** and **vip-paints** so selected user effects are applied whenever the user re-joins the server. This would nullify the player from opening the menus again each map change to re-apply said preferences.
 - [ ] Fix Unusual Effects (custom or legit) not being kept after applying a custom paint effect, could probably be permanently fixed when the merge is applied.
 
+# Requirements
+In order for these plugins to work you need the following dependencies installed on your server:
+* [TF2Items](https://forums.alliedmods.net/showthread.php?t=115100)
+* [TF2Attributes](https://forums.alliedmods.net/showthread.php?t=210221)
+* [TF2IDB](https://forums.alliedmods.net/showthread.php?t=255885)
+
+For compilation you require my custom includes provided in the repository, the includes from the dependencies mentioned above and the following includes as well:
+* [MoreColors](https://forums.alliedmods.net/showthread.php?t=185016)
+
 # Plugin Pack Usage
 
 ## vip-australium
