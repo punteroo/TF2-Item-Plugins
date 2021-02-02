@@ -4,6 +4,8 @@ Some months ago I started developing private plugins for communities that modify
 I might make some other releases if people want things fixed or whatever. I just release them because keeping them private is worthless, they're already everywhere and even some other devs have made their own versions of this public as well.
 Feel free to use these plugins wherever you want, just don't change the author name of it and I'll thank you forever.
 
+**This plugin makes use of the ``m_bValidatedAttachedEntity`` networked property, which bypasses the restriction made by VALVe where fake items are invisible to others. Everyone on the server will be able to see your items with these plugins.**
+
 If you have any doubts or want something else, just write it down on the **Issues** tab or contact me directly through **Discord**. My tag is **puntero#6566**. Enjoy.
 
 # TODO
