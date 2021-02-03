@@ -242,8 +242,6 @@ bool GiveAustralium(int client, char[] classname, int index, int level, int qual
 	if (fId < 0)
 		fId = index;
 	
-	PrintToChatAll("%d", fId);
-	
 	TF2Items_SetItemIndex(weapon, fId);
 	
 	if ((fId == 169 || index == 169) && (TF2_GetPlayerClass(client) != TFClass_Engineer))
