@@ -9,7 +9,7 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define PLUGIN_VERSION "2.0.0"
+#define PLUGIN_VERSION "2.3.1"
 
 public Plugin myinfo = 
 {
@@ -19,15 +19,6 @@ public Plugin myinfo =
 	version = PLUGIN_VERSION,
 	url = "https://forums.alliedmods.net/member.php?u=213425"
 };
-
-public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
-{
-	EngineVersion g_engineversion = GetEngineVersion();
-	if (g_engineversion != Engine_TF2)
-	{
-		SetFailState("This plugin was made for use with Team Fortress 2 only.");
-	}
-}
 
 /////////////////////
 // GLOBAL DECLARES //
@@ -57,6 +48,19 @@ int ammoOff;
 /////////////////////
 /////////////////////
 
+public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
+{
+	EngineVersion g_engineversion = GetEngineVersion();
+	if (g_engineversion != Engine_TF2)
+	{
+		SetFailState("This plugin was made for use with Team Fortress 2 only.");
+	}
+	
+	// Re-write the global effects menu whenever a late-load of the plugin has happened.
+	delete effMenu;
+	EffectsMenu();
+}
+
 public void OnPluginStart()
 {
 	RegAdminCmd("sm_unusual", 	CMD_Unusual, ADMFLAG_RESERVATION, "Opens the Unusual menu.");
@@ -80,28 +84,9 @@ public void OnPluginStart()
 
 public void OnMapStart()
 {
-	for (int i = 0; i < sizeof(Unu); i++) {
-		delete Unu[i];
-		CloseHandle(Unu[i]);
-	}
-	
+	// Re-write the global effects menu whenever the map starts.
 	delete effMenu;
-	
 	EffectsMenu();
-}
-
-public void OnClientConnected(int client)
-{
-	// Generate a new UnusualClient handle for the player.
-	Unu[client] = new UnusualClient();
-	Unu[client].Initialize();
-}
-
-public void OnClientDisconnect(int client)
-{
-	// Empty the old Unusual slot for new players joining.
-	delete Unu[client];
-	CloseHandle(Unu[client]);
 }
 
 public Action CMD_Unusual(int client, int args)
@@ -119,8 +104,8 @@ public int MainHdlr(Menu menu, MenuAction action, int client, int p2)
 			
 			int id = StringToInt(sel);
 			if (id > 0) {
-				Unu[client].SetSlot(p2);
-				Unu[client].SetId(id);
+				Unu[client].slot = p2;
+				Unu[client].id[p2] = id;
 				
 				DisplayMenu(effMenu, client, MENU_TIME_FOREVER);
 			}
@@ -135,8 +120,10 @@ public int EffectHdlr(Menu menu, MenuAction action, int client, int p2)
 		case MenuAction_Select: {
 			char sel[32];
 			GetMenuItem(menu, p2, sel, sizeof(sel));
+			
+			int slot = Unu[client].slot;
 
-			Unu[client].SetUnusual(StringToFloat(sel));
+			Unu[client].unusual[slot] = StringToFloat(sel);
 			
 			ForceChange(client);
 		}
@@ -150,9 +137,9 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
 	// First check if it's a hat and not any weapon or item.
 	if ((StrEqual(classname, "tf_wearable")) && !IsWearableWeapon(iItemDefinitionIndex) && IsHatUnusual(iItemDefinitionIndex)) {
 		for (int i = 0; i < 3; i++) {
-			float unusual = Unu[client].GetUnusual(i);
+			float unusual = Unu[client].unusual[i];
 			
-			int id = Unu[client].GetId(i);
+			int id = Unu[client].id[i];
 			if ((iItemDefinitionIndex == id) && (unusual > 0.0)) {
 				int flags = OVERRIDE_ALL | FORCE_GENERATION;
 				
