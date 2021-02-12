@@ -20,7 +20,7 @@ If you have any doubts or want something else, just write it down on the **Issue
 In order for these plugins to work you need the following dependencies installed on your server:
 * [TF2Items](https://forums.alliedmods.net/showthread.php?t=115100)
 * [TF2Attributes](https://forums.alliedmods.net/showthread.php?t=210221)
-* [TF2IDB](https://github.com/FlaminSarge/tf2idb)
+* [TF2IDB (FlaminSarge)](https://github.com/FlaminSarge/tf2idb)
 
 For compilation you require my custom includes provided in the repository, the includes from the dependencies mentioned above and the following includes as well:
 * [MoreColors](https://forums.alliedmods.net/showthread.php?t=185016)
