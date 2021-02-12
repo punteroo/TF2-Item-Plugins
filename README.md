@@ -9,11 +9,13 @@ For example, Skial uses it for their "!items" system that allows you to equip an
 
 TF2 servers have not suffered any GLST token bans in many years. Even CS:GO servers, which were frequently hit by GLST token bans for using fake knife/gun/etc skin plugins, have slowly over time stopped being hit by GLST token bans. It seems Valve has either lightened up on former community "restrictions", or they're too busy with HL:A to notice. lmao nevermind, seems they just banned the GLST tokens of someone in our community who was generating them en masse. Be careful if you choose to use this fucker as Valve could rear their heads towards Team Fortress 2 next. Especially be careful if you're a group like Skial that abuses this netprop.
 
-Basically, by using this plugin, you are acknowledging that there is still the possibility that Valve could come around one day and blacklist your server. Don't blame me if such a thing happens either.```
+Basically, by using this plugin, you are acknowledging that there is still the possibility that Valve could come around one day and blacklist your server. Don't blame me if such a thing happens either.
+```
+
 [source](https://github.com/NiagaraDryGuy/TF2ServersidePlayerAttachmentFixer/blob/90c2a2f41cd8b4fc872de59d05114913064066cd/README.md#frequently-asked-question-yes-singular)
 
 I might make some other releases if people want things fixed or whatever. I just release them because keeping them private is worthless, they're already everywhere and even some other devs have made their own versions of this public as well.
-Feel free to use these plugins wherever you want, just don't change the author name of it and I'll thank you forever.
+Feel free to use these plugins wherever you want.
 
 **This plugin makes use of the ``m_bValidatedAttachedEntity`` networked property, which bypasses the restriction made by VALVe where fake items are invisible to others. Everyone on the server will be able to see your items with these plugins.**
 
