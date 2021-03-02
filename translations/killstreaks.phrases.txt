@@ -1,0 +1,167 @@
+"Phrases"
+{
+	"Ks_MenuTitle"
+	{
+		"en"		"Killstreak Manager"
+		"es"		"Administrador de Killstreaks"
+	}
+	"Ks_Slot_1"
+	{
+		"en"		"Primary Weapon"
+		"es"		"Arma Primaria"
+	}
+	"Ks_Slot_2"
+	{
+		"en"		"Secondary Weapon"
+		"es"		"Arma Secundaria"
+	}
+	"Ks_Slot_3"
+	{
+		"en"		"Melee Weapon"
+		"es"		"Arma Cuerpo a Cuerpo"
+	}
+	"Ks_Slot_All"
+	{
+		"en"		"All Weapons"
+		"es"		"Todas las Armas"
+	}
+	
+	"Ks_AllWeps_Apply_On"
+	{
+		"en"		"Apply to all weapons? YES"
+		"es"		"¿Aplicar a todas las armas? SÍ"
+	}
+	"Ks_AllWeps_Apply_Off"
+	{
+		"en"		"Apply to all weapons? NO"
+		"es"		"¿Aplicar a todas las armas? NO"
+	}
+	
+	"Ks_Edit_MenuTitle"
+	{
+		"#format"	"{1:s}"
+		"en"		"Configuring: {1}"
+		"es"		"Configurando: {1}"
+	}
+	
+	"Ks_Edit_Killstreak"
+	{
+		"#format"	"{1:s}"
+		"en"		"Type: {1}"
+		"es"		"Tipo: {1}"
+	}
+	"Ks_Edit_Killstreak_MenuTitle"
+	{
+		"en"		"Select a Type"
+		"es"		"Selecciona un Tipo"
+	}
+	"Ks_Edit_Killstreak1"
+	{
+		"en"		"Normal"
+		"es"		"Normal"
+	}
+	"Ks_Edit_Killstreak2"
+	{
+		"en"		"Specialized"
+		"es"		"Especializado"
+	}
+	"Ks_Edit_Killstreak3"
+	{
+		"en"		"Professional"
+		"es"		"Profesional"
+	}
+	
+	"Ks_Edit_Sheen"
+	{
+		"#format"	"{1:s}"
+		"en"		"Sheen: {1}"
+		"es"		"Brillo: {1}"
+	}
+	"Ks_Edit_Sheen_MenuTitle"
+	{
+		"en"		"Select a Sheen"
+		"es"		"Selecciona un Brillo"
+	}
+	"Ks_Edit_Sheen1"
+	{
+		"en"		"Team-Shine"
+		"es"		"Brillo de Equipo"
+	}
+	"Ks_Edit_Sheen2"
+	{
+		"en"		"Deadly Daffodil"
+		"es"		"Narcisista Mortal"
+	}
+	"Ks_Edit_Sheen3"
+	{
+		"en"		"Manndarin"
+		"es"		"Manndarín"
+	}
+	"Ks_Edit_Sheen4"
+	{
+		"en"		"Mean Green"
+		"es"		"Verde Infame"
+	}
+	"Ks_Edit_Sheen5"
+	{
+		"en"		"Agonizing Emerald"
+		"es"		"Esmeralda Agonizante"
+	}
+	"Ks_Edit_Sheen6"
+	{
+		"en"		"Villainous Violet"
+		"es"		"Violeta del Villano"
+	}
+	"Ks_Edit_Sheen7"
+	{
+		"en"		"Hot Rod"
+		"es"		"Motor a 1000 Revoluciones"
+	}
+	
+	"Ks_Edit_Streaker"
+	{
+		"#format"	"{1:s}"
+		"en"		"Killstreaker: {1}"
+		"es"		"Killstreaker: {1}"
+	}
+	"Ks_Edit_Streaker_MenuTitle"
+	{
+		"en"		"Select a Killstreaker"
+		"es"		"Selecciona un Killstreaker"
+	}
+	"Ks_Edit_Streaker2002"
+	{
+		"en"		"Fire Horns"
+		"es"		"Cuernos de Fuego"
+	}
+	"Ks_Edit_Streaker2003"
+	{
+		"en"		"Cerebral Discharge"
+		"es"		"Descarga Cerebral"
+	}
+	"Ks_Edit_Streaker2004"
+	{
+		"en"		"Tornado"
+		"es"		"Tornado"
+	}
+	"Ks_Edit_Streaker2005"
+	{
+		"en"		"Flames"
+		"es"		"Llamas"
+	}
+	"Ks_Edit_Streaker2006"
+	{
+		"en"		"Singularity"
+		"es"		"Singularidad"
+	}
+	"Ks_Edit_Streaker2007"
+	{
+		"en"		"Incinerator"
+		"es"		"Incinerador"
+	}
+	"Ks_Edit_Streaker2008"
+	{
+		"en"		"Hypno-Beam"
+		"es"		"Rayo Hipnótico"
+	}
+}

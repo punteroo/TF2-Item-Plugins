@@ -1,0 +1,764 @@
+"Phrases"
+{
+	"Unu_MenuTitle"
+	{
+		"en"		"Unusual Hat Manager"
+		"es"		"Administrador de Inusuales"
+	}
+	"Unu_ErrIncompatible"
+	{
+		"en"		"Could not find compatible hats."
+		"es"		"No se encontraron hats compatibles."
+	}
+	"Unu_HelpText"
+	{
+		"en"		"Usage: Select your desired hat and effect."
+		"es"		"Uso: Selecciona tu hat equipado y el efecto deseado."
+	}
+	"Unu_Eff_MenuTitle"
+	{
+		"en"		"Select Effect"
+		"es"		"Seleccionar Efecto"
+	}
+	
+	"Unu_Eff6"
+	{
+		"en"		"Green Confetti"
+		"es"		"Confeti Verde"
+	}
+	"Unu_Eff7"
+	{
+		"en"		"Purple Confetti"
+		"es"		"Confeti Púrpura"
+	}
+	"Unu_Eff8"
+	{
+		"en"		"Haunted Ghosts"
+		"es"		"Fantasmas Encantados"
+	}
+	"Unu_Eff9"
+	{
+		"en"		"Green Energy"
+		"es"		"Energía Verde"
+	}
+	"Unu_Eff10"
+	{
+		"en"		"Purple Energy"
+		"es"		"Energía Púrpura"
+	}
+	"Unu_Eff11"
+	{
+		"en"		"Circling TF Logo"
+		"es"		"Logotipo de TF Giratorio"
+	}
+	"Unu_Eff12"
+	{
+		"en"		"Massed Flies"
+		"es"		"Moscas Amasadas"
+	}
+	"Unu_Eff13"
+	{
+		"en"		"Burning Flames"
+		"es"		"Llamas Ardientes"
+	}
+	"Unu_Eff14"
+	{
+		"en"		"Scorching Flames"
+		"es"		"Llamas Abrasadoras"
+	}
+	"Unu_Eff15"
+	{
+		"en"		"Searing Plasma"
+		"es"		"Plasma Ígneo"
+	}
+	"Unu_Eff17"
+	{
+		"en"		"Sunbeams"
+		"es"		"Rayos de Sol"
+	}
+	"Unu_Eff18"
+	{
+		"en"		"Circling Peace Sign"
+		"es"		"Símbolo de la Paz Giratorio"
+	}
+	"Unu_Eff19"
+	{
+		"en"		"Circling Heart"
+		"es"		"Corazón Giratorio"
+	}
+	"Unu_Eff29"
+	{
+		"en"		"Stormy Storm"
+		"es"		"Tormenta Tormentosa"
+	}
+	"Unu_Eff30"
+	{
+		"en"		"Blizzardy Storm"
+		"es"		"Tormenta Gélida"
+	}
+	"Unu_Eff31"
+	{
+		"en"		"Nuts n' Bolts"
+		"es"		"Tuercas y Tornillos"
+	}
+	"Unu_Eff32"
+	{
+		"en"		"Orbiting Planets"
+		"es"		"Planetas Orbitantes"
+	}
+	"Unu_Eff33"
+	{
+		"en"		"Orbiting Fire"
+		"es"		"Fuego Orbitante"
+	}
+	"Unu_Eff34"
+	{
+		"en"		"Bubbling"
+		"es"		"Burbujeante"
+	}
+	"Unu_Eff35"
+	{
+		"en"		"Smoking"
+		"es"		"Humeante"
+	}
+	"Unu_Eff36"
+	{
+		"en"		"Steaming"
+		"es"		"Vaporoso"
+	}
+	"Unu_Eff37"
+	{
+		"en"		"Flaming Lantern"
+		"es"		"Farolillo Llameante"
+	}
+	"Unu_Eff38"
+	{
+		"en"		"Cloudy Moon"
+		"es"		"Luna Nublada"
+	}
+	"Unu_Eff39"
+	{
+		"en"		"Cauldron Bubbles"
+		"es"		"Burbujas de Caldero"
+	}
+	"Unu_Eff40"
+	{
+		"en"		"Eerie Orbiting Fire"
+		"es"		"Fuego Orbitante Espeluznante"
+	}
+	"Unu_Eff43"
+	{
+		"en"		"Knifestorm"
+		"es"		"Tormenta de Cuchillos"
+	}
+	"Unu_Eff44"
+	{
+		"en"		"Misty Skull"
+		"es"		"Calavera Nebulosa"
+	}
+	"Unu_Eff45"
+	{
+		"en"		"Harvest Moon"
+		"es"		"Luna de Cosecha"
+	}
+	"Unu_Eff46"
+	{
+		"en"		"It's A Secret To Everybody"
+		"es"		"Es un Secreto para todos"
+	}
+	"Unu_Eff47"
+	{
+		"en"		"Stormy 13th Hour"
+		"es"		"Hora Bruja Tormentosa"
+	}
+	"Unu_Eff56"
+	{
+		"en"		"Kill-a-Watt"
+		"es"		"Medidor de Vatios"
+	}
+	"Unu_Eff57"
+	{
+		"en"		"Terror-Watt"
+		"es"		"Vatios Terroríficos"
+	}
+	"Unu_Eff58"
+	{
+		"en"		"Cloud 9"
+		"es"		"Nube 9"
+	}
+	"Unu_Eff59"
+	{
+		"en"		"Aces High"
+		"es"		"Póker de Aces"
+	}
+	"Unu_Eff60"
+	{
+		"en"		"Dead Presidents"
+		"es"		"Presidentes Muertos"
+	}
+	"Unu_Eff61"
+	{
+		"en"		"Miami Nights"
+		"es"		"Noches de Miami"
+	}
+	"Unu_Eff62"
+	{
+		"en"		"Disco Beat Down"
+		"es"		"Fiebre de Música Disco"
+	}
+	"Unu_Eff63"
+	{
+		"en"		"Phosphorous"
+		"es"		"Fosforoso"
+	}
+	"Unu_Eff64"
+	{
+		"en"		"Sulphurous"
+		"es"		"Sulfuroso"
+	}
+	"Unu_Eff65"
+	{
+		"en"		"Memory Leak"
+		"es"		"Laguna Mental"
+	}
+	"Unu_Eff66"
+	{
+		"en"		"Overclocked"
+		"es"		"Overclockeado"
+	}
+	"Unu_Eff67"
+	{
+		"en"		"Electrostatic"
+		"es"		"Electrostático"
+	}
+	"Unu_Eff68"
+	{
+		"en"		"Power Surge"
+		"es"		"Subida de Tensión"
+	}
+	"Unu_Eff69"
+	{
+		"en"		"Anti-Freeze"
+		"es"		"Anticongelante"
+	}
+	"Unu_Eff70"
+	{
+		"en"		"Time Warp"
+		"es"		"Agujero de Gusano"
+	}
+	"Unu_Eff71"
+	{
+		"en"		"Green Black Hole"
+		"es"		"Agujero Verdinegro"
+	}
+	"Unu_Eff72"
+	{
+		"en"		"Roboactive"
+		"es"		"Roboactivo"
+	}
+	"Unu_Eff73"
+	{
+		"en"		"Arcana"
+		"es"		"Arcana"
+	}
+	"Unu_Eff74"
+	{
+		"en"		"Spellbound"
+		"es"		"Hechizado"
+	}
+	"Unu_Eff75"
+	{
+		"en"		"Chiroptera Venenata"
+		"es"		"Chiroptera Venenata"
+	}
+	"Unu_Eff76"
+	{
+		"en"		"Poisoned Shadows"
+		"es"		"Sombras Envenenadas"
+	}
+	"Unu_Eff77"
+	{
+		"en"		"Something Burning This Way Comes"
+		"es"		"Se Acerca Algo en Llamas"
+	}
+	"Unu_Eff78"
+	{
+		"en"		"Hellfire"
+		"es"		"Fuego Infernal"
+	}
+	"Unu_Eff79"
+	{
+		"en"		"Darkblaze"
+		"es"		"Resplandor Oscuro"
+	}
+	"Unu_Eff80"
+	{
+		"en"		"Demonflame"
+		"es"		"Llama Demoniaca"
+	}
+	"Unu_Eff81"
+	{
+		"en"		"Bonzo The All-Gnawing"
+		"es"		"Bonzo el Róelotodo"
+	}
+	"Unu_Eff82"
+	{
+		"en"		"Amaranthine"
+		"es"		"Amarantina"
+	}
+	"Unu_Eff83"
+	{
+		"en"		"Stare From Beyond"
+		"es"		"Desde el Más Allá"
+	}
+	"Unu_Eff84"
+	{
+		"en"		"The Ooze"
+		"es"		"Ser de la Ciénaga"
+	}
+	"Unu_Eff85"
+	{
+		"en"		"Ghastly Ghosts Jr."
+		"es"		"Fantasmas Fantasmagóricos"
+	}
+	"Unu_Eff86"
+	{
+		"en"		"Haunted Phantasm Jr."
+		"es"		"Fantasma Embrujado Jr."
+	}
+	"Unu_Eff87"
+	{
+		"en"		"Frostbite"
+		"es"		"Congelación"
+	}
+	"Unu_Eff88"
+	{
+		"en"		"Molten Mallard"
+		"es"		"Pato Asado"
+	}
+	"Unu_Eff89"
+	{
+		"en"		"Morning Glory"
+		"es"		"Mañana Gloriosa"
+	}
+	"Unu_Eff90"
+	{
+		"en"		"Death at Dusk"
+		"es"		"Muerte al Atardecer"
+	}
+	"Unu_Eff91"
+	{
+		"en"		"Abduction"
+		"es"		"Abducción"
+	}
+	"Unu_Eff92"
+	{
+		"en"		"Atomic"
+		"es"		"Atómico"
+	}
+	"Unu_Eff93"
+	{
+		"en"		"Subatomic"
+		"es"		"Subatómico"
+	}
+	"Unu_Eff94"
+	{
+		"en"		"Electric Hat Protector"
+		"es"		"Protector de Sombrero Eléctrico"
+	}
+	"Unu_Eff95"
+	{
+		"en"		"Magnetic Hat Protector"
+		"es"		"Protector de Sombrero Magnético"
+	}
+	"Unu_Eff96"
+	{
+		"en"		"Voltaic Hat Protector"
+		"es"		"Protector de Sombrero Voltáico"
+	}
+	"Unu_Eff97"
+	{
+		"en"		"Galactic Codex"
+		"es"		"Códice Galáctico"
+	}
+	"Unu_Eff98"
+	{
+		"en"		"Ancient Codex"
+		"es"		"Códice Antiguo"
+	}
+	"Unu_Eff99"
+	{
+		"en"		"Nebula"
+		"es"		"Nebulosa"
+	}
+	"Unu_Eff100"
+	{
+		"en"		"Death by Disco"
+		"es"		"Muerte por Disco"
+	}
+	"Unu_Eff101"
+	{
+		"en"		"It's a Mystery to Everyone"
+		"es"		"Es un Misterio para Todos"
+	}
+	"Unu_Eff102"
+	{
+		"en"		"It's a Puzzle to Me"
+		"es"		"Es un Rompecabezas para Mí"
+	}
+	"Unu_Eff103"
+	{
+		"en"		"Ether Trail"
+		"es"		"Estela Etérea"
+	}
+	"Unu_Eff104"
+	{
+		"en"		"Nether Trail"
+		"es"		"Estela del Inframundo"
+	}
+	"Unu_Eff105"
+	{
+		"en"		"Ancient Eldritch"
+		"es"		"Eldritch Ancestral"
+	}
+	"Unu_Eff106"
+	{
+		"en"		"Eldritch Flame"
+		"es"		"Llama de Eldritch"
+	}
+	"Unu_Eff107"
+	{
+		"en"		"Neutron Star"
+		"es"		"Estrella de Neutrones"
+	}
+	"Unu_Eff108"
+	{
+		"en"		"Tesla Coil"
+		"es"		"Bobina de Tesla"
+	}
+	"Unu_Eff109"
+	{
+		"en"		"Starstorm Insomnia"
+		"es"		"Insomnio Estelar"
+	}
+	"Unu_Eff110"
+	{
+		"en"		"Starstorm Slumber"
+		"es"		"Sueño Estelar"
+	}
+	"Unu_Eff111"
+	{
+		"en"		"Brain Drain"
+		"es"		"Drenaje Cerebral"
+	}
+	"Unu_Eff112"
+	{
+		"en"		"Open Mind"
+		"es"		"Mente Abierta"
+	}
+	"Unu_Eff113"
+	{
+		"en"		"Head of Steam"
+		"es"		"Volcán de Huesos"
+	}
+	"Unu_Eff114"
+	{
+		"en"		"Galactic Gateway"
+		"es"		"Portal Galáctico"
+	}
+	"Unu_Eff115"
+	{
+		"en"		"The Eldritch Opening"
+		"es"		"Portal Misterioso"
+	}
+	"Unu_Eff116"
+	{
+		"en"		"The Dark Doorway"
+		"es"		"Portal Oscuro"
+	}
+	"Unu_Eff117"
+	{
+		"en"		"Ring of Fire"
+		"es"		"Anillo de Fuego"
+	}
+	"Unu_Eff118"
+	{
+		"en"		"Vicious Circle"
+		"es"		"Círculo Vicioso"
+	}
+	"Unu_Eff119"
+	{
+		"en"		"White Lightning"
+		"es"		"Luces Blancas"
+	}
+	"Unu_Eff120"
+	{
+		"en"		"Omniscient Orb"
+		"es"		"Orbe Ombisciente"
+	}
+	"Unu_Eff121"
+	{
+		"en"		"Clairvoyance"
+		"es"		"Clarividencia"
+	}
+	"Unu_Eff122"
+	{
+		"en"		"Fifth Dimension"
+		"es"		"Quinta Dimensión"
+	}
+	"Unu_Eff123"
+	{
+		"en"		"Vicious Vortex"
+		"es"		"Vórtice Vicioso"
+	}
+	"Unu_Eff124"
+	{
+		"en"		"Menacing Miasma"
+		"es"		"Miasma Amenazador"
+	}
+	"Unu_Eff125"
+	{
+		"en"		"Abyssal Aura"
+		"es"		"Aura Abisal"
+	}
+	"Unu_Eff126"
+	{
+		"en"		"Wicked Wood"
+		"es"		"Madera Maligna"
+	}
+	"Unu_Eff127"
+	{
+		"en"		"Ghastly Grove"
+		"es"		"Arboleda Abominable"
+	}
+	"Unu_Eff128"
+	{
+		"en"		"Mystical Medley"
+		"es"		"Mezcla Mística"
+	}
+	"Unu_Eff129"
+	{
+		"en"		"Ethereal Essence"
+		"es"		"Esencia Etérea"
+	}
+	"Unu_Eff130"
+	{
+		"en"		"Twisted Radiance"
+		"es"		"Resplandor Retorcido"
+	}
+	"Unu_Eff131"
+	{
+		"en"		"Violet Vortex"
+		"es"		"Vórtice Violeta"
+	}
+	"Unu_Eff132"
+	{
+		"en"		"Verdant Vortex"
+		"es"		"Vórtice Verde"
+	}
+	"Unu_Eff133"
+	{
+		"en"		"Valiant Vortex"
+		"es"		"Vórtice Valiente"
+	}
+	"Unu_Eff134"
+	{
+		"en"		"Sparkling Lights"
+		"es"		"Luces Centelleantes"
+	}
+	"Unu_Eff135"
+	{
+		"en"		"Frozen Icefall"
+		"es"		"Cascada de Hielo"
+	}
+	"Unu_Eff136"
+	{
+		"en"		"Fragmented Gluons"
+		"es"		"Gluones Fragmentados"
+	}
+	"Unu_Eff137"
+	{
+		"en"		"Fragmented Quarks"
+		"es"		"Cuarks Fragmentados"
+	}
+	"Unu_Eff138"
+	{
+		"en"		"Fragmented Photons"
+		"es"		"Fotones Fragmentados"
+	}
+	"Unu_Eff139"
+	{
+		"en"		"Defragmenting Reality"
+		"es"		"Realidad Defragmentada"
+	}
+	"Unu_Eff141"
+	{
+		"en"		"Fragmenting Reality"
+		"es"		"Realidad Fragmentada"
+	}
+	"Unu_Eff142"
+	{
+		"en"		"Refragmenting Reality"
+		"es"		"Realidad Re-fragmentada"
+	}
+	"Unu_Eff143"
+	{
+		"en"		"Snowfallen"
+		"es"		"Nevasca"
+	}
+	"Unu_Eff144"
+	{
+		"en"		"Snowblinded"
+		"es"		"Ceguera de la Nieve"
+	}
+	"Unu_Eff145"
+	{
+		"en"		"Pyroland Daydream"
+		"es"		"Ensoñación Pyrolandesa"
+	}
+	"Unu_Eff147"
+	{
+		"en"		"Verdatica"
+		"es"		"Verdático"
+	}
+	"Unu_Eff148"
+	{
+		"en"		"Aromatica"
+		"es"		"Aromático"
+	}
+	"Unu_Eff149"
+	{
+		"en"		"Chromatica"
+		"es"		"Cromático"
+	}
+	"Unu_Eff150"
+	{
+		"en"		"Prismatica"
+		"es"		"Prismático"
+	}
+	"Unu_Eff151"
+	{
+		"en"		"Bee Swarm"
+		"es"		"Enjambre de Abejas"
+	}
+	"Unu_Eff152"
+	{
+		"en"		"Frisky Fireflies"
+		"es"		"Luciérnagas Juguetonas"
+	}
+	"Unu_Eff153"
+	{
+		"en"		"Smoldering Spirits"
+		"es"		"Espíritus Humeantes"
+	}
+	"Unu_Eff154"
+	{
+		"en"		"Wandering Wisps"
+		"es"		"Ánimas Errantes"
+	}
+	"Unu_Eff155"
+	{
+		"en"		"Kaleidoscope"
+		"es"		"Caleidoscopio"
+	}
+	"Unu_Eff156"
+	{
+		"en"		"Green Giggler"
+		"es"		"Espíritus Verdes"
+	}
+	"Unu_Eff157"
+	{
+		"en"		"Laugh-O-Lantern"
+		"es"		"Espíritus Naranjas"
+	}
+	"Unu_Eff158"
+	{
+		"en"		"Plum Prankster"
+		"es"		"Espíritus Bromistas"
+	}
+	"Unu_Eff159"
+	{
+		"en"		"Pyroland Nightmare"
+		"es"		"Pesadilla Pyrolandesa"
+	}
+	"Unu_Eff160"
+	{
+		"en"		"Gravelly Ghoul"
+		"es"		"Gárgola de Grava"
+	}
+	"Unu_Eff161"
+	{
+		"en"		"Vexed Volcanics"
+		"es"		"Gárgola Volcánica"
+	}
+	"Unu_Eff162"
+	{
+		"en"		"Gourdian Angel"
+		"es"		"Ángel Guardián"
+	}
+	"Unu_Eff163"
+	{
+		"en"		"Pumpkin Party"
+		"es"		"Fiesta de la Calabaza"
+	}
+	"Unu_Eff164"
+	{
+		"en"		"Frozen Fractals"
+		"es"		"Fractales Gélidos"
+	}
+	"Unu_Eff165"
+	{
+		"en"		"Lavender Landfall"
+		"es"		"Llovizna de Lavanda"
+	}
+	"Unu_Eff166"
+	{
+		"en"		"Special Snowfall"
+		"es"		"Nevada Especial"
+	}
+	"Unu_Eff167"
+	{
+		"en"		"Divine Desire"
+		"es"		"Deseo Divino"
+	}
+	"Unu_Eff168"
+	{
+		"en"		"Distant Dream"
+		"es"		"Sueño Distante"
+	}
+	"Unu_Eff169"
+	{
+		"en"		"Violent Wintertide"
+		"es"		"Borrasca Violenta"
+	}
+	"Unu_Eff170"
+	{
+		"en"		"Blighted Snowstorm"
+		"es"		"Tormena Alheña"
+	}
+	"Unu_Eff171"
+	{
+		"en"		"Pale Nimbus"
+		"es"		"Nimbo Pálido"
+	}
+	"Unu_Eff172"
+	{
+		"en"		"Genus Plasmos"
+		"es"		"Genus Plasmos"
+	}
+	"Unu_Eff173"
+	{
+		"en"		"Serenus Lumen"
+		"es"		"Serenus Lumen"
+	}
+	"Unu_Eff174"
+	{
+		"en"		"Ventum Maris"
+		"es"		"Ventum Maris"
+	}
+	"Unu_Eff175"
+	{
+		"en"		"Mirthful Mistletoe"
+		"es"		"Muérdago Jovial"
+	}
+}

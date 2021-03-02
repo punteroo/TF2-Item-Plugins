@@ -1,0 +1,168 @@
+"Phrases"
+{
+	"Paint_MenuTitle"
+	{
+		"en"		"Paint Manager"
+		"es"		"Administrador de Pinturas"
+	}
+	"Paint_ErrIncompatible"
+	{
+		"en"		"No compatible cosmetics were found."
+		"es"		"No se encontraron cosméticos compatibles."
+	}
+	
+	
+	"Paint_Edit_MenuTitle"
+	{
+		"en"		"Select a paint color"
+		"es"		"Seleccione una pintura"
+	}
+	
+	"Paint1"
+	{
+		"en"		"Indubitably Green"
+		"es"		"Indudablemente Verde"
+	}
+	"Paint2"
+	{
+		"en"		"Zepheniah's Greed"
+		"es"		"Codicia de Zepheniah"
+	}
+	"Paint3"
+	{
+		"en"		"Noble Hatter's Violet"
+		"es"		"Violeta del Sombrero Noble"
+	}
+	"Paint4"
+	{
+		"en"		"Color No. 216-190-216"
+		"es"		"No. de Color 216-190-216"
+	}
+	"Paint5"
+	{
+		"en"		"A Deep Commitment to Purple"
+		"es"		"Un Profundo Compromiso con el Púrpura"
+	}
+	"Paint6"
+	{
+		"en"		"Mann Co. Orange"
+		"es"		"Naranja Mann Co."
+	}
+	"Paint7"
+	{
+		"en"		"Muskelmannbraun"
+		"es"		"Marrón de Musculitos"
+	}
+	"Paint8"
+	{
+		"en"		"Peculiarly Drab Tincture"
+		"es"		"Tintura Peculiarmente Pálida"
+	}
+	"Paint9"
+	{
+		"en"		"Radigan Conagher Brown"
+		"es"		"Marrón Radigan Conagher"
+	}
+	"Paint10"
+	{
+		"en"		"Ye Olde Rustic Colour"
+		"es"		"El Color Rústico y Anticuado"
+	}
+	"Paint11"
+	{
+		"en"		"Australium Gold"
+		"es"		"Dorado Australium"
+	}
+	"Paint12"
+	{
+		"en"		"Aged Moustache Grey"
+		"es"		"Gris Bigote Anciano"
+	}
+	"Paint13"
+	{
+		"en"		"An Extraordinary Abundance of Tinge"
+		"es"		"Una Extraordinaria Abundancia de Tinte"
+	}
+	"Paint14"
+	{
+		"en"		"A Distinctive Lack of Hue"
+		"es"		"Distintiva Falta de Tonalidad"
+	}
+	"Paint15"
+	{
+		"en"		"Pink as Hell"
+		"es"		"Endiabladamente Rosa"
+	}
+	"Paint16"
+	{
+		"en"		"A Color Similar to Slate"
+		"es"		"Un Color Similar a la Pizarra"
+	}
+	"Paint17"
+	{
+		"en"		"Drably Olive"
+		"es"		"Oliva Monótono"
+	}
+	"Paint18"
+	{
+		"en"		"The Bitter Taste of Defeat and Lime"
+		"es"		"El Sabor Amargo de la Derrota y la Lima"
+	}
+	"Paint19"
+	{
+		"en"		"The Color of a Gentlemann's Business Pants"
+		"es"		"El Color de los Pantalones de un Hombre de Negocios"
+	}
+	"Paint20"
+	{
+		"en"		"Dark Salmon Injustice"
+		"es"		"Oscura Injusticia del Salmón"
+	}
+	"Paint21"
+	{
+		"en"		"A Mann's Mint"
+		"es"		"Menta Varonil"
+	}
+	"Paint22"
+	{
+		"en"		"After Eight"
+		"es"		"After Eight"
+	}
+	
+	
+	"Paint23"
+	{
+		"en"		"Team Spirit"
+		"es"		"Espíritu de Equipo"
+	}
+	"Paint24"
+	{
+		"en"		"Operator's Overalls"
+		"es"		"Mono de Operario"
+	}
+	"Paint25"
+	{
+		"en"		"Waterlogged Lab Coat"
+		"es"		"Bata de Laboratorio Empapada"
+	}
+	"Paint26"
+	{
+		"en"		"Balaclavas Are Forever"
+		"es"		"Pasamontañas para la Eternidad"
+	}
+	"Paint27"
+	{
+		"en"		"An Air of Debonair"
+		"es"		"Un Aire Elegante"
+	}
+	"Paint28"
+	{
+		"en"		"The Value of Teamwork"
+		"es"		"El Valor del Trabajo en Equipo"
+	}
+	"Paint29"
+	{
+		"en"		"Cream Spirit"
+		"es"		"Espíritu Crema"
+	}
+}

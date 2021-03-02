@@ -1,0 +1,33 @@
+"Phrases"
+{
+	"UnuGlow_Message"
+	{
+		"en"		"{unusual}[UnuGlow] {white}Your effects will be applied on respawn."
+		"es"		"{unusual}[UnuGlow] {white}Tus efectos se aplicarán cuando respawnees."
+	}
+	"UnuGlow3041"
+	{
+		"en"		"Emerald Allurement"
+		"es"		"Atracción Esmeralda"
+	}
+	"UnuGlow3042"
+	{
+		"en"		"Pyrophoric Personality"
+		"es"		"Personalidad Pirofórica"
+	}
+	"UnuGlow3043"
+	{
+		"en"		"Spellbound Aspect"
+		"es"		"Aspecto Embrujado"
+	}
+	"UnuGlow3044"
+	{
+		"en"		"Static Shock"
+		"es"		"Carga Eléctrica"
+	}
+	"UnuGlow3045"
+	{
+		"en"		"Veno Shock"
+		"es"		"Carga Tóxica"
+	}
+}
