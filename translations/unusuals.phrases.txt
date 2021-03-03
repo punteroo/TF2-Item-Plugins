@@ -20,7 +20,13 @@
 		"en"		"Select Effect"
 		"es"		"Seleccionar Efecto"
 	}
-	
+
+
+	"Unu_Eff0"
+	{
+		"en"		"No Override"
+		"es"		"Ningun Efecto"
+	}	
 	"Unu_Eff6"
 	{
 		"en"		"Green Confetti"
@@ -70,6 +76,11 @@
 	{
 		"en"		"Searing Plasma"
 		"es"		"Plasma Ígneo"
+	}
+	"Unu_Eff16"
+	{
+		"en"		"Vivid Plasma"
+		"es"		"Plasma Vívido"
 	}
 	"Unu_Eff17"
 	{

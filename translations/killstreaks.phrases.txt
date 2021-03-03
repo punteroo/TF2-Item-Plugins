@@ -55,6 +55,11 @@
 		"en"		"Select a Type"
 		"es"		"Selecciona un Tipo"
 	}
+	"Ks_Edit_Killstreak0"
+	{
+		"en"		"No Killstreak"
+		"es"		"Sin Killstreak"
+	}
 	"Ks_Edit_Killstreak1"
 	{
 		"en"		"Normal"
@@ -81,6 +86,11 @@
 	{
 		"en"		"Select a Sheen"
 		"es"		"Selecciona un Brillo"
+	}
+	"Ks_Edit_Sheen0"
+	{
+		"en"		"No Sheen"
+		"es"		"Sin Brillo"
 	}
 	"Ks_Edit_Sheen1"
 	{
@@ -128,6 +138,11 @@
 	{
 		"en"		"Select a Killstreaker"
 		"es"		"Selecciona un Killstreaker"
+	}
+	"Ks_Edit_Streaker2001"
+	{
+		"en"		"No Killstreaker"
+		"es"		"Sin Killstreaker"
 	}
 	"Ks_Edit_Streaker2002"
 	{
