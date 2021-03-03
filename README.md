@@ -22,11 +22,11 @@ Feel free to use these plugins wherever you want.
 If you have any doubts or want something else, just write it down on the **Issues** tab or contact me directly through **Discord**. My tag is **puntero#6566**. Enjoy.
 
 # TODO
-- [ ] Translations, for Spanish and English users.
+- [x] Translations, for Spanish and English users.
 - [ ] Merge **vip-unusuals** with **vip-paints** to maintain functionality between them, as one removes the others' effects.
 - [ ] Implement preference saving on **vip-australium**, **vip-unusuals** and **vip-paints** so selected user effects are applied whenever the user re-joins the server. This would nullify the player from opening the menus again each map change to re-apply said preferences.
 - [ ] Fix Unusual Effects (custom or legit) not being kept after applying a custom paint effect, could probably be permanently fixed when the merge is applied.
-- [x] **ONLY FIXED ON ``vip-unusuals``** Refresh handles upon re-loading to prevent plugin failing on late-load (reload, refresh or unload and load)
+- [x] ~~Refresh handles upon re-loading to prevent plugin failing on late-load (reload, refresh or unload and load)~~ Replaced all ``Handle``s for ``enum struct``s.
 - [x] Fix a **probably problematic** memory leak in **vip-unusuals**.
 
 # Requirements
