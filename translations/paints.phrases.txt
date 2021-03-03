@@ -10,6 +10,11 @@
 		"en"		"No compatible cosmetics were found."
 		"es"		"No se encontraron cosméticos compatibles."
 	}
+	"Paint_Usage"
+	{
+		"en"		"Usage: Select your desired hat and paint."
+		"es"		"Uso: Seleccione su hat preferido y luego su pintura."
+	}
 	
 	
 	"Paint_Edit_MenuTitle"
@@ -18,6 +23,11 @@
 		"es"		"Seleccione una pintura"
 	}
 	
+	"Paint0"
+	{
+		"en"		"No Paint Override"
+		"es"		"Sin Pintura"
+	}
 	"Paint1"
 	{
 		"en"		"Indubitably Green"
