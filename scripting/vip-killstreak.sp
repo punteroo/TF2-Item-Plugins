@@ -8,7 +8,10 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define PLUGIN_VERSION "2.3.1"
+#define PLUGIN_VERSION "2.3.2"
+
+#define MAX_SHEENS 		8
+#define MAX_STREAKERS	8
 
 public Plugin myinfo = 
 {
@@ -33,16 +36,6 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 // Per client stringmap
 KsClient Ks[MAXPLAYERS + 1];
 
-// Sheen names array
-char Sheens[8][32] = {
-	"None", "Team-Shine", "Deadly Daffodil", "Manndarin", "Mean Green", "Agonizing Emerald", "Villainous Violet", "Hot Rod"
-};
-
-// Killstreaker names array
-char Streakers[8][32] = {
-	"None", "Fire Horns", "Cerebral Discharge", "Tornado", "Flames", "Singularity", "Incinerator", "Hypno-Beam"
-};
-
 /////////////////////
 /////////////////////
 /////////////////////
@@ -60,26 +53,9 @@ public void OnPluginStart()
 	// Event for item "refresh" detection.
 	// Hook to the items given / resupply event, this manages when to give the user their weapons.
 	// Also hook into the player_spawn event just in case post_inventory_application isn't called (happens sometimes)
-}
-
-public void OnMapStart()
-{
-	for (int i = 0; i < sizeof(Ks); i++)
-		delete Ks[i];
-}
-public void OnClientPostAdminCheck(int client)
-{
-	// We need to create a KsClient object for clients that join.
-	// I planned to do this only for the ones who have CUSTOM1 flag access, but because of admin cache reloads i'll just assign it to everyone.
-	// Also initialize values so we avoid any errors.
-	Ks[client] = new KsClient();
-	Ks[client].Initialize();
-}
-
-public void OnClientDisconnect(int client)
-{
-	// If he has disconnected, empty this object slot so we don't occupy any extra memory.
-	delete Ks[client];
+	
+	LoadTranslations("killstreaks.phrases.txt");
+	// Translations !
 }
 
 public Action CMD_Ks (int client, int args)
@@ -115,13 +91,13 @@ public int MainHdlr (Menu menu, MenuAction action, int client, int p2)
 			
 			if (StrEqual(sel, "kD", false) ||
 				StrEqual(sel, "kE", false)) {
-				Ks[client].AllWeapons(!Ks[client].IsAllMode());
+				Ks[client].all = !Ks[client].all;
 				
 				GenerateMenu(client);
 			}
 			else {
 				int slot = StringToInt(sel);
-				Ks[client].SetSlot(slot);
+				Ks[client].slot = slot;
 				
 				GenerateWeaponMenu(client, slot);
 			}
@@ -141,20 +117,17 @@ public int WeaponHdlr (Menu menu, MenuAction action, int client, int p2)
 			GetMenuItem(menu, p2, sel, sizeof(sel));
 			
 			if (StrEqual(sel, "type", false)) {
-				float type[3];
-				Ks[client].GetType(type);
+				int slot = Ks[client].slot;
 				
-				int slot = Ks[client].GetSlot();
+				int newKs = Ks[client].type[slot] + 1;
+				Ks[client].type[slot] = ((0 <= Ks[client].type[slot] <= 3) ? newKs : 0);
 				
-				type[slot] += 1.0;
-				Ks[client].SetType((0.0 <= type[slot] <= 3.0) ? type[slot] : 0.0, slot);
+				SetClientKillstreak(client, newKs, slot);
 				
-				SetClientKillstreak(client, type[slot], slot);
-				
-				switch (RoundToFloor(type[slot])) {
+				switch (newKs) {
 					case 0, 1, 2: {
 						if (IsPlayerAlive(client) && IsClientInGame(client))
-							RemoveKillstreak(client, RoundToFloor(type[slot]));
+							RemoveKillstreak(client, newKs);
 					}
 				}
 				
@@ -186,9 +159,9 @@ public int SheenHdlr (Menu menu, MenuAction action, int client, int p2)
 			char sel[32];
 			GetMenuItem(menu, p2, sel, sizeof(sel));
 			
-			int slot = Ks[client].GetSlot();
+			int slot = Ks[client].slot;
 			
-			Ks[client].SetSheen(StringToFloat(sel), slot);
+			Ks[client].sheen[slot] = StringToInt(sel);
 			
 			// ONLY APPLY KILLSTREAK EFFECTS IF THE PLAYER IS ALIVE
 			// Menus can be used even when dead, so we must make sure he doesn't fuck anything up on accident.
@@ -212,9 +185,9 @@ public int StreakerHdlr (Menu menu, MenuAction action, int client, int p2)
 			char sel[32];
 			GetMenuItem(menu, p2, sel, sizeof(sel));
 			
-			int slot = Ks[client].GetSlot();
+			int slot = Ks[client].slot;
 			
-			Ks[client].SetStreaker(StringToFloat(sel), slot);
+			Ks[client].streaker[slot] = StringToInt(sel);
 			
 			// ONLY APPLY KILLSTREAK EFFECTS IF THE PLAYER IS ALIVE
 			// Menus can be used even when dead, so we must make sure he doesn't fuck anything up on accident.
@@ -243,135 +216,133 @@ public int StreakerHdlr (Menu menu, MenuAction action, int client, int p2)
 // @arg int client - Represents the client integer.
 // @arg float type - The type of Killstreak the client chose.
 // @noreturn
-void SetClientKillstreak(int client, float type, int slot = 0)
+void SetClientKillstreak(int client, int type, int slot = 0)
 {
 	// This function all it does is reset Sheen values and Killstreaker values whenever the client switches types of killstreaks.
 	// Since we support All Weapons Mode, there is a different method for either.
 	// Makes this block kind of repetitive but it doesn't matter.
 	
 	// First check if the client has All Weapons Mode enabled.
-	if (Ks[client].IsAllMode()) {
+	if (Ks[client].all) {
 		// If he does, we'll loop through all the slots and set them to 0.
 		for (int i = 0; i < 3; i++) {
 			// Use as an Integer to avoid 0.0 or 1.0
-			switch (RoundToFloor(type)) {
+			switch (type) {
 				case 0, 1: {
 					// If he has no Killstreak enabled or a Normal Killstreak, empty Sheen and Killstreaker values.
-					Ks[client].SetSheen(0.0, i);
-					Ks[client].SetStreaker(0.0, i);
+					Ks[client].sheen[i] = 0;
+					Ks[client].streaker[i] = 0;
 				}
 				case 2:
 					// If he has a Specialized Killstreak, empty only the Sheen value.
-					Ks[client].SetStreaker(0.0, i);
+					Ks[client].streaker[i] = 0;
 			}
 		}
 	}
 	// Same goes here, except it's just for one specific slot.
 	else {
-		switch (RoundToFloor(type)) {
+		switch (type) {
 			case 0, 1: {
-				Ks[client].SetSheen(0.0, slot);
-				Ks[client].SetStreaker(0.0, slot);
+				Ks[client].sheen[slot] = 0;
+				Ks[client].streaker[slot] = 0;
 			}
 			case 2:
-				Ks[client].SetStreaker(0.0, slot);
+				Ks[client].streaker[slot] = 0;
 		}
 	}
 }
 // GenerateMenu() - Generates a menu with the client's weapons, and displays it to them. This allows them to choose individual weapon effects.
 void GenerateMenu(int client)
 {
-	Menu menu = CreateMenu(MainHdlr);
+	Menu menu = new Menu(MainHdlr);
 	
-	SetMenuTitle(menu, "Killstreak Manager");
+	char title[64];
+	Format(title, 64, "%T", "Ks_MenuTitle", client);
+	menu.SetTitle(title);
 	
-	bool isAll = Ks[client].IsAllMode();
+	bool isAll = Ks[client].all;
 	
 	if (!isAll) {
-		AddMenuItem(menu, "0", "Slot primario");
-		AddMenuItem(menu, "1", "Slot secundario");
-		AddMenuItem(menu, "2", "Slot melee");
+		for (int i = 1; i < 4; i++) {
+			char slot[32], temp[32], iStr[4];
+			IntToString(i - 1, iStr, sizeof(iStr));
+			Format(temp, 32, "Ks_Slot_%d", i);
+			
+			Format(slot, 32, "%T", temp, client);
+			
+			menu.AddItem(iStr, slot);
+		}
 	}
-	else
-		AddMenuItem(menu, "0", "Todas las Armas");
+	else {
+		char slot[32];
+		Format(slot, 32, "%T", "Ks_Slot_All", client);
+		
+		menu.AddItem("0", slot);
+	}
 	
-	AddMenuItem(menu, "-", "-----------------", ITEMDRAW_DISABLED);
+	menu.AddItem("-", "-----------------", ITEMDRAW_DISABLED);
 	
-	isAll ? AddMenuItem(menu, "kD", "Aplicar en todo: Sí") : AddMenuItem(menu, "kE", "Aplicar en todo: No");
+	char applyMsg[64];
+	Format(applyMsg, 64, "%T", isAll ? "Ks_AllWeps_Apply_On" : "Ks_AllWeps_Apply_Off", client);
+	menu.AddItem(isAll ? "kD" : "kE", applyMsg);
 	
-	AddMenuItem(menu, "---", "Created by puntero @ 2020.", ITEMDRAW_DISABLED);
+	menu.ExitButton = true;
 	
-	SetMenuExitButton(menu, true);
-	
-	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+	menu.Display(client, MENU_TIME_FOREVER);
 }
 
 // GenerateWeaponMenu() - Generates a menu that lets you see the details of the selected weapon, and set them accordingly.
 void GenerateWeaponMenu(int client, int slot)
 {
-	Menu menu = CreateMenu(WeaponHdlr);
+	Menu menu = new Menu(WeaponHdlr);
 	
 	char title[20];
-	bool isAll = Ks[client].IsAllMode();
+	bool isAll = Ks[client].all;
 	
 	if (!isAll) {
-		switch (slot) {
-			case 0:
-				Format(title, sizeof(title), "Arma Primaria");
-			case 1:
-				Format(title, sizeof(title), "Arma Secundaria");
-			case 2:
-				Format(title, sizeof(title), "Arma Melee");
-		}
+		char slotStr[4];
+		Format(slotStr, 4, "Ks_Slot_%d", slot);
+		
+		Format(title, sizeof(title), "%T", slotStr, client);
 	}
 	else
-		Format(title, sizeof(title), "Todas las Armas");
+		Format(title, sizeof(title), "%T", "Ks_Slot_All", client);
 	
-	SetMenuTitle(menu, "Configurando: %s", title);
+	menu.SetTitle("%T", "Ks_Edit_MenuTitle", client, title);
 	
-	float 	type[3], 		sheen[3], 		streaker[3];
-	char 	typeStr[64], 	sheenStr[64], 	streakerStr[64];
-	Ks[client].GetType(type);
-	Ks[client].GetSheen(sheen);
-	Ks[client].GetStreaker(streaker);
+	int 	type = Ks[client].type[slot], 			sheen = Ks[client].sheen[slot], 			streaker = Ks[client].streaker[slot];
+	char 	typeStr[64], 							sheenStr[64], 								streakerStr[64];
 	
-	switch (RoundToFloor(type[slot])) {
-		case 0:
-			Format(typeStr, sizeof(typeStr), "Killstreak: Ninguno");
-		case 1:
-			Format(typeStr, sizeof(typeStr), "Killstreak: Normal");
-		case 2:
-			Format(typeStr, sizeof(typeStr), "Killstreak: Specialized");
-		case 3:
-			Format(typeStr, sizeof(typeStr), "Killstreak: Professional");
-	}
-	AddMenuItem(menu, "type", typeStr);
+	char temp[64];
+	Format(temp, sizeof(temp), "Ks_Edit_Killstreak%d", type);
+	Format(temp, sizeof(temp), "%T", temp, client);
 	
-	/*if () {
-		Format(sh, sizeof(sh), "Sheen: %s", All ? Sheens[RoundToFloor(KsAllVals[client][1])] : Sheens[RoundToFloor(KsFx[client][slot][0])]);
-		AddMenuItem(menu, "sheen", sh);
+	Format(typeStr, sizeof(typeStr), "%T", "Ks_Edit_Killstreak", client, temp);
+	
+	menu.AddItem("type", typeStr);
+	
+	if (type > 1) {
+		Format(temp, sizeof(temp), "Ks_Edit_Sheen%d", sheen);
+		Format(temp, sizeof(temp), "%T", temp, client);
 		
-		if ((All ? RoundToFloor(KsAllVals[client][0]) : KsSlots[client][slot]) > 2) {
-			Format(st, sizeof(st), "Killstreaker: %s", All ? Streakers[(KsAllVals[client][2] > 2000) ? (RoundToFloor(KsAllVals[client][2]) - 2001) : RoundToFloor(KsAllVals[client][2])] : Streakers[(KsFx[client][slot][1] > 2000) ? (RoundToFloor(KsFx[client][slot][1]) - 2001) : RoundToFloor(KsFx[client][slot][1])]);
-			AddMenuItem(menu, "streaker", st);
-		}
-	}			old shitty code, ignore this shithole			*/
-	
-	if (type[slot] > 1.0) {
-		Format(sheenStr, sizeof(sheenStr), "Sheen: %s", Sheens[RoundToFloor(sheen[slot])]);
-		AddMenuItem(menu, "sheen", sheenStr);
+		Format(sheenStr, sizeof(sheenStr), "%T", "Ks_Edit_Sheen", client, temp);
 		
-		if (type[slot] > 2.0) {
-			Format(streakerStr, sizeof(streakerStr), "Killstreaker: %s", Streakers[RoundToFloor((streaker[slot] > 2000) ? (streaker[slot] - 2001) : streaker[slot])]);
-			AddMenuItem(menu, "streaker", streakerStr);
+		menu.AddItem("sheen", sheenStr);
+		
+		if (type > 2) {
+			Format(temp, sizeof(temp), "Ks_Edit_Streaker%d", (streaker == 0) ? 2001 : streaker);
+			Format(temp, sizeof(temp), "%T", temp, client);
+			
+			Format(streakerStr, sizeof(streakerStr), "%T", "Ks_Edit_Streaker", client, temp);
+			
+			menu.AddItem("streaker", streakerStr);
 		}
 	}
 	
-	AddMenuItem(menu, "-", "----------------------------------", ITEMDRAW_DISABLED);
+	menu.AddItem("-", "----------------------------------", ITEMDRAW_DISABLED);
 	
-	SetMenuExitButton(menu, true);
-	
-	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+	menu.ExitButton = true;
+	menu.Display(client, MENU_TIME_FOREVER);
 }
 
 // GenerateEffectsMenu() - This generates the menus utilized to select effects on weapons.
@@ -379,39 +350,45 @@ void GenerateEffectsMenu(int client, bool showStr = false)
 {
 	/////////////////////////////////////////////////
 	// SHEENS MENU
-	Menu m1 = CreateMenu(SheenHdlr);
+	Menu m1 = new Menu(SheenHdlr);
 	
-	SetMenuTitle(m1, "Seleccionar Sheen");
+	m1.SetTitle("%T", "Ks_Edit_Sheen_MenuTitle", client);
 	
-	for (int i = 0; i < sizeof(Sheens); i++) {
+	for (int i = 0; i < MAX_SHEENS; i++) {
 		// SourcePawn strings are a pain in the ass to manage
-		char info[32];
+		char info[32], sheen[64];
 		Format(info, sizeof(info), "%d", i);
 		
-		AddMenuItem(m1, info, Sheens[i]);
+		Format(sheen, sizeof(sheen), "Ks_Edit_Sheen%d", i);
+		Format(sheen, sizeof(sheen), "%T", sheen, client);
+		
+		m1.AddItem(info, sheen);
 	}
 	
-	SetMenuExitButton(m1, true);
+	m1.ExitButton = true;
 	
 	if (!showStr)
-		DisplayMenu(m1, client, MENU_TIME_FOREVER);
+		m1.Display(client, MENU_TIME_FOREVER);
 	/////////////////////////////////////////////////
 	// KILLSTREAKER MENU
-	Menu m2 = CreateMenu(StreakerHdlr);
+	Menu m2 = new Menu(StreakerHdlr);
 	
-	SetMenuTitle(m2, "Selecionar Killstreaker");
+	m2.SetTitle("%T", "Ks_Edit_Streaker_MenuTitle", client);
 
-	for (int i = 2001; i < (sizeof(Streakers) + 2001); i++) {
-		char info[32];
+	for (int i = 2001; i < (MAX_STREAKERS + 2001); i++) {
+		char info[32], streaker[64];
 		Format(info, sizeof(info), "%d", i);
 		
-		AddMenuItem(m2, info, Streakers[i - 2001]);
+		Format(streaker, sizeof(streaker), "Ks_Edit_Streaker%d", i);
+		Format(streaker, sizeof(streaker), "%T", streaker, client);
+		
+		m2.AddItem(info, streaker);
 	}
 	
-	SetMenuExitButton(m2, true);
+	m2.ExitButton = true;
 	
 	if (showStr)
-		DisplayMenu(m2, client, MENU_TIME_FOREVER);
+		m2.Display(client, MENU_TIME_FOREVER);
 	/////////////////////////////////////////////////
 }
 
@@ -420,21 +397,17 @@ void ApplyKillstreak(int client)
 {
 	int entity[3] = INVALID_ENT_REFERENCE;
 	
-	float types[3], sheens[3], streakers[3];
-	Ks[client].GetType(types);
-	Ks[client].GetSheen(sheens);
-	Ks[client].GetStreaker(streakers);
-	
 	for (int i = 0; i < sizeof(entity); i++) {
 		entity[i] = GetPlayerWeaponSlot(client, i);
 		
+		int type = Ks[client].type[i], sheen = Ks[client].sheen[i], streaker = Ks[client].streaker[i];
 		if (entity[i] != INVALID_ENT_REFERENCE) {
-			if (types[i] > 0.0) {
-				TF2Attrib_SetByDefIndex(entity[i], 2025, types[i]);
-				if (types[i] > 1.0) {
-					TF2Attrib_SetByDefIndex(entity[i], 2014, sheens[i]);
-					if (types[i] > 2.0)
-						TF2Attrib_SetByDefIndex(entity[i], 2013, streakers[i]);
+			if (type > 0) {
+				TF2Attrib_SetByDefIndex(entity[i], 2025, float(type));
+				if (type > 1) {
+					TF2Attrib_SetByDefIndex(entity[i], 2014, float(sheen));
+					if (type > 2)
+						TF2Attrib_SetByDefIndex(entity[i], 2013, float(streaker));
 				}
 			}
 		}

@@ -1,36 +1,33 @@
 #include <tf2attributes>
 
-char glowNames[6][64] = {
-	"None", "Emerald Allurement", "Pyrophoric Personality", "Spellbound Aspect",
-	"Static Shock", "Veno Shock"
-};
-
-float glowIds[6] = {
-	0.0, 3041.0, 3042.0, 3043.0,
-	3044.0, 3045.0
+int glowIds[6] = {
+	0, 3041, 3042, 3043,
+	3044, 3045
 }
 
-/* CreateGlowMenu()
- * Creates a menu with all the glow options.
+/* CreateGlowMenu(int client)
+ * Creates a menu with all the glow options, and displays it to the player.
  * ----------------------------------
- * return - Menu Handle with all data needed. Handler name is "glowHdlr"
+ * return - void()
  */
-Menu CreateGlowMenu()
+void CreateGlowMenu(int client)
 {
-	Menu menu = CreateMenu(glowHdlr);
+	Menu menu = new Menu(glowHdlr);
 	
-	menu.SetTitle("Glow Effects");
+	menu.SetTitle("%T", "UnuGlow_MenuTitle", client);
 	
-	for (int i = 0; i < sizeof(glowNames); i++) {
-		char idStr[12];
-		FloatToString(glowIds[i], idStr, sizeof(idStr));
+	for (int i = 0; i < sizeof(glowIds); i++) {
+		char idStr[12], glowName[64];
+		IntToString(glowIds[i], idStr, sizeof(idStr));
 		
-		menu.AddItem(idStr, glowNames[i]);
+		Format(glowName, sizeof(glowName), "UnuGlow%d", glowIds[i]);
+		Format(glowName, sizeof(glowName), "%T", glowName, client);
+		
+		menu.AddItem(idStr, glowName);
 	}
 	
 	menu.ExitButton = true;
-	
-	return menu;
+	menu.Display(client, MENU_TIME_FOREVER);
 }
 
 /*
@@ -48,4 +45,5 @@ bool SetGlow(int client, float eff)
 	
 	if (IsClientInGame(client) && IsPlayerAlive(client) && eff > 0.0)
 		return TF2Attrib_SetByName(client, "attach particle effect", eff);
+	return false;
 }

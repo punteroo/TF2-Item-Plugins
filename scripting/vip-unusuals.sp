@@ -9,7 +9,7 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define PLUGIN_VERSION "2.3.1"
+#define PLUGIN_VERSION "2.3.2"
 
 public Plugin myinfo = 
 {
@@ -36,10 +36,6 @@ UnusualClient Unu[MAXPLAYERS + 1];
 // Per Client painted hat information, first dimension is Client Index, second dimension is Hat Slot.
 PaintedHat PPlayer[MAXPLAYERS + 1][3];
 
-// Global effects Menu
-// it's always static, so generate it only once.
-Menu effMenu;
-
 // Networkable Server Offsets (used for regen)
 int clipOff;
 int ammoOff;
@@ -55,10 +51,6 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	{
 		SetFailState("This plugin was made for use with Team Fortress 2 only.");
 	}
-	
-	// Re-write the global effects menu whenever a late-load of the plugin has happened.
-	delete effMenu;
-	EffectsMenu();
 }
 
 public void OnPluginStart()
@@ -78,15 +70,9 @@ public void OnPluginStart()
 	// This piece of code makes an SDKCall for the Regenerate function inside the game's gamedata.
 	// Refreshes the entire player to ensure Unusuals take effect instantly.
 	
-	EffectsMenu();
-	// Generates the effects menu (with all the unusual effects available)
-}
-
-public void OnMapStart()
-{
-	// Re-write the global effects menu whenever the map starts.
-	delete effMenu;
-	EffectsMenu();
+	LoadTranslations("unusuals.phrases.txt");
+	// Translations !
+	// Now you can look at your favourite effects in English or Spanish!
 }
 
 public Action CMD_Unusual(int client, int args)
@@ -107,7 +93,7 @@ public int MainHdlr(Menu menu, MenuAction action, int client, int p2)
 				Unu[client].slot = p2;
 				Unu[client].id[p2] = id;
 				
-				DisplayMenu(effMenu, client, MENU_TIME_FOREVER);
+				EffectsMenu(client);
 			}
 		}
 	}
@@ -151,9 +137,12 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
 				
 				TF2Items_SetQuality(hItem, 5);
 				
-				TF2Items_SetNumAttributes(hItem, 4);
+				TF2Items_SetNumAttributes(hItem, 5);
 				
+				// attach particle effect
 				TF2Items_SetAttribute(hItem, 0, 134, unusual);
+				// particle effect use head origin
+				TF2Items_SetAttribute(hItem, 4, 520, 1.0);
 				
 				int attribs[3] =  { 142, 261, 1004 };
 				for (int j = 0; j < sizeof(attribs); j++) {
@@ -190,9 +179,9 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
 // GenerateHatsMenu() - Generates the first menu where the player's hats are listed
 void GenerateHatsMenu(int client)
 {
-	Menu menu = CreateMenu(MainHdlr);
+	Menu menu = new Menu(MainHdlr);
 	
-	SetMenuTitle(menu, "Unusual Hat Manager");
+	menu.SetTitle("%T", "Unu_MenuTitle", client);
 
 	int hat = -1, found = 0;
 	while ((hat = FindEntityByClassname(hat, "tf_wearable")) != -1) {
@@ -204,33 +193,41 @@ void GenerateHatsMenu(int client)
 				IntToString(id, idStr, sizeof(idStr));
 				TF2IDB_GetItemName(id, hatName, sizeof(hatName));
 				
-				AddMenuItem(menu, idStr, hatName);
+				menu.AddItem(idStr, hatName);
 				found++;
 			}
 		}
 	}
+
 	if (!found) {
-		AddMenuItem(menu, "-", "No se encontraron hats compatibles.", ITEMDRAW_DISABLED);
+		char msg[128];
+		Format(msg, sizeof(msg), "%T", "Unu_ErrIncompatible", client);
+		
+		menu.AddItem("-", msg, ITEMDRAW_DISABLED);
 	}
 	
-	AddMenuItem(menu, "-", "Uso: Selecciona tu hat equipado y el efecto deseado.", ITEMDRAW_DISABLED);
+	char usage[128];
+	Format(usage, sizeof(usage), "%T", "Unu_HelpText", client);
 	
-	AddMenuItem(menu, "-", "- - - - - - - - - - - - - - - - - -", ITEMDRAW_DISABLED);
+	menu.AddItem("-", usage, ITEMDRAW_DISABLED);
 	
-	SetMenuExitButton(menu, true);
-	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+	menu.AddItem("-", "- - - - - - - - - - - - - - - - - -", ITEMDRAW_DISABLED);
+	
+	menu.ExitButton = true;
+	menu.Display(client, MENU_TIME_FOREVER);
 }
 
-// EffectsMenu() - Generates the effects menu. This is done always on start.
-void EffectsMenu()
+// EffectsMenu() - Generates the effects menu. Now, generates every time a client needs it (because of translations)
+void EffectsMenu(int client)
 {
-	effMenu = CreateMenu(EffectHdlr);
+	Menu effMenu = new Menu(EffectHdlr);
 	
-	SetMenuTitle(effMenu, "Seleccionar Efecto");
+	effMenu.SetTitle("%T", "Unu_Eff_MenuTitle", client);
 	
-	AddUnusuals(effMenu);
+	AddUnusuals(effMenu, client);
 	
-	SetMenuExitButton(effMenu, true);
+	effMenu.ExitButton = true;
+	effMenu.Display(client, MENU_TIME_FOREVER);
 }
 
 // ForceChange() - Forces an SDKCall on the player to get the Unusual effects to be applied instantly.
@@ -304,6 +301,8 @@ public Action ForceTimer(Handle timer, any client)
 	}
 	
 	GenerateHatsMenu(client);
+	
+	delete timer;
 }
 
 // IsHatUnusual() - Retrieves wether the current worn hat CAN have an Unusual effect.

@@ -6,7 +6,7 @@ enum struct UnusualClient {
 	float unusual[3];	// This array keeps the Unusual effect IDs selected by the user, each slot number also corresponds to the hat slot selected.
 }
 
-// Unusual Particle Effects List
+// Unusual Particle Effects ID List
 int unusualIds[150] =  {
 	0, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 29, 30, 31, 
 	32, 33, 34, 35, 36, 37, 38, 39, 40, 43, 44, 45, 46, 47, 56, 57, 
@@ -22,49 +22,18 @@ int unusualIds[150] =  {
 	164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175
 };
 
-char unusualNames[150][64] =  {
-	"Ninguno", "Green Confetti", "Purple Confetti", "Haunted Ghosts", "Green Energy", 
-	"Purple Energy", "Circling TF Logo", "Massed Flies", "Burning Flames", 
-	"Scorching Flames", "Searing Plasma", "Vivid Plasma", "Sunbeams", 
-	"Circling Peace Sign", "Circling Heart", "Stormy Storm", "Blizzardy Storm", 
-	"Nuts n' Bolts", "Orbiting Planets", "Orbiting Fire", "Bubbling", "Smoking", 
-	"Steaming", "Flaming Lantern", "Cloudy Moon", "Cauldron Bubbles", "Eerie Orbiting Fire", 
-	"Knifestorm", "Misty Skull", "Harvest Moon", "It's A Secret To Everybody", 
-	"Stormy 13th Hour", "Kill-a-Watt", "Terror-Watt", "Cloud 9", "Aces High", 
-	"Dead Presidents", "Miami Nights", "Disco Beat Down", "Phosphorous", "Sulphurous", 
-	"Memory Leak", "Overclocked", "Electrostatic", "Power Surge", "Anti-Freeze", 
-	"Time Warp", "Green Black Hole", "Roboactive", "Arcana", "Spellbound", 
-	"Chiroptera Venenata", "Poisoned Shadow", "Something Burning This Way Comes", 
-	"Hellfire", "Darkblaze", "Demonflame", "Bonzo The All-Gnawing", "Amaranthine", 
-	"Stare From Beyond", "The Ooze", "Ghastly Ghosts Jr", "Haunted Phantasm Jr", 
-	"Frostbite", "Molten Mallard", "Morning Glory", "Death at Dusk", "Abduction", 
-	"Atomic", "Subatomic", "Electric Hat Protector", "Magnetic Hat Protector", 
-	"Voltaic Hat Protector", "Galactic Codex", "Ancient Codex", "Nebula", "Death by Disco", 
-	"It's a mystery to everyone", "It's a puzzle to me", "Ether Trail", "Nether Trail", 
-	"Ancient Eldritch", "Eldritch Flame", "Neutron Star", "Tesla Coil", "Starstorm Insomnia", 
-	"Starstorm Slumber", "Brain Drain", "Open Mind", "Head of Steam", "Galactic Gateway", 
-	"The Eldritch Opening", "The Dark Doorway", "Ring of Fire", "Vicious Circle", "White Lightning", 
-	"Omniscient Orb", "Clairvoyance", "Fifth Dimension", "Vicious Vortex", "Menacing Miasma", "Abyssal Aura", 
-	"Wicked Wood", "Ghastly Grove", "Mystical Medley", "Ethereal Essence", "Twisted Radiance", 
-	"Violet Vortex", "Verdant Vortex", "Valiant Vortex", "Sparkling Lights", "Frozen Icefall", 
-	"Fragmented Gluons", "Fragmented Quarks", "Fragmented Photons", "Defragmenting Reality", 
-	"Fragmenting Reality", "Refragmenting Reality", "Snowfallen", "Snowblinded", "Pyroland Daydream", 
-	"Verdatica", "Aromatica", "Chromatica", "Prismatica", "Bee Swarm", "Frisky Fireflies", "Smoldering Spirits", 
-	"Wandering Wisps", "Kaleidoscope", 
-	"Green Giggler", "Laugh-O-Lantern", "Plum Prankster", "Pyroland Nightmare", "Gravelly Ghoul", "Vexed Volcanics", 
-	"Gourdian Angels", "Pumpkin Party", 
-	"Frozen Fractals", "Lavender Landfall", "Special Snowfall", "Divine Desire", "Distant Dream", "Violent Wintertide", 
-	"Blighted Snowstorm", "Pale Nimbus", "Genus Plasmos", "Serenus Lumen", "Ventum Maris", "Mirthful Mistletoe"
-};
-
-// AddUnusuals(Menu menu) - Adds all Unusual Effects to a menu.
-void AddUnusuals(Menu menu)
+// AddUnusuals(Menu menu, int client) - Adds all Unusual Effects to a menu.
+void AddUnusuals(Menu menu, int client)
 {
 	for (int i = 0; i < sizeof(unusualIds); i++) {
 		char id[5];
 		IntToString(unusualIds[i], id, sizeof(id));
 		
-		AddMenuItem(menu, id, unusualNames[i]);
+		char trans[128], fTrans[128];
+		Format(trans, sizeof(trans), "Unu_Eff%d", unusualIds[i]);
+		Format(fTrans, sizeof(fTrans), "%T", trans, client);
+		
+		menu.AddItem(id, fTrans);
 	}
 }
 
@@ -150,3 +119,41 @@ methodmap UnusualClient < StringMap {
 }
 
 */
+
+/*
+Old hardcoded unusual names, ditched for translation files
+
+char unusualNames[150][64] =  {
+	"Ninguno", "Green Confetti", "Purple Confetti", "Haunted Ghosts", "Green Energy", 
+	"Purple Energy", "Circling TF Logo", "Massed Flies", "Burning Flames", 
+	"Scorching Flames", "Searing Plasma", "Vivid Plasma", "Sunbeams", 
+	"Circling Peace Sign", "Circling Heart", "Stormy Storm", "Blizzardy Storm", 
+	"Nuts n' Bolts", "Orbiting Planets", "Orbiting Fire", "Bubbling", "Smoking", 
+	"Steaming", "Flaming Lantern", "Cloudy Moon", "Cauldron Bubbles", "Eerie Orbiting Fire", 
+	"Knifestorm", "Misty Skull", "Harvest Moon", "It's A Secret To Everybody", 
+	"Stormy 13th Hour", "Kill-a-Watt", "Terror-Watt", "Cloud 9", "Aces High", 
+	"Dead Presidents", "Miami Nights", "Disco Beat Down", "Phosphorous", "Sulphurous", 
+	"Memory Leak", "Overclocked", "Electrostatic", "Power Surge", "Anti-Freeze", 
+	"Time Warp", "Green Black Hole", "Roboactive", "Arcana", "Spellbound", 
+	"Chiroptera Venenata", "Poisoned Shadow", "Something Burning This Way Comes", 
+	"Hellfire", "Darkblaze", "Demonflame", "Bonzo The All-Gnawing", "Amaranthine", 
+	"Stare From Beyond", "The Ooze", "Ghastly Ghosts Jr", "Haunted Phantasm Jr", 
+	"Frostbite", "Molten Mallard", "Morning Glory", "Death at Dusk", "Abduction", 
+	"Atomic", "Subatomic", "Electric Hat Protector", "Magnetic Hat Protector", 
+	"Voltaic Hat Protector", "Galactic Codex", "Ancient Codex", "Nebula", "Death by Disco", 
+	"It's a mystery to everyone", "It's a puzzle to me", "Ether Trail", "Nether Trail", 
+	"Ancient Eldritch", "Eldritch Flame", "Neutron Star", "Tesla Coil", "Starstorm Insomnia", 
+	"Starstorm Slumber", "Brain Drain", "Open Mind", "Head of Steam", "Galactic Gateway", 
+	"The Eldritch Opening", "The Dark Doorway", "Ring of Fire", "Vicious Circle", "White Lightning", 
+	"Omniscient Orb", "Clairvoyance", "Fifth Dimension", "Vicious Vortex", "Menacing Miasma", "Abyssal Aura", 
+	"Wicked Wood", "Ghastly Grove", "Mystical Medley", "Ethereal Essence", "Twisted Radiance", 
+	"Violet Vortex", "Verdant Vortex", "Valiant Vortex", "Sparkling Lights", "Frozen Icefall", 
+	"Fragmented Gluons", "Fragmented Quarks", "Fragmented Photons", "Defragmenting Reality", 
+	"Fragmenting Reality", "Refragmenting Reality", "Snowfallen", "Snowblinded", "Pyroland Daydream", 
+	"Verdatica", "Aromatica", "Chromatica", "Prismatica", "Bee Swarm", "Frisky Fireflies", "Smoldering Spirits", 
+	"Wandering Wisps", "Kaleidoscope", 
+	"Green Giggler", "Laugh-O-Lantern", "Plum Prankster", "Pyroland Nightmare", "Gravelly Ghoul", "Vexed Volcanics", 
+	"Gourdian Angels", "Pumpkin Party", 
+	"Frozen Fractals", "Lavender Landfall", "Special Snowfall", "Divine Desire", "Distant Dream", "Violent Wintertide", 
+	"Blighted Snowstorm", "Pale Nimbus", "Genus Plasmos", "Serenus Lumen", "Ventum Maris", "Mirthful Mistletoe"
+};*/

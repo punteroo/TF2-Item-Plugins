@@ -6,7 +6,9 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define PLUGIN_VERSION "2.3.1"
+#define PLUGIN_VERSION "2.3.2"
+
+#define MAX_PAINTS 30
 
 public Plugin myinfo = 
 {
@@ -21,37 +23,18 @@ enum struct PaintPlayer {
 	// This enum controls a player's painted hats status.
 	// A maximum of 3 painted hats can be used at a time.
 	
+	// Paint values stored from player selections.
 	float values[3];
+	// Hat m_iItemDefinitionIndex
 	int   hats[3];
+	
 	// Temporary slot variable to keep track of selections during apply.
 	int   tSlot;
 	
+	// Did the user choose a team-colored paint?
 	bool  hasTeamPaint;
+	// Team ID the player currently has.
 	int   teamIndex;
-	
-	float GetPaintForSlot(int slot) {
-		return this.values[slot];
-	}
-	
-	int   GetHatForSlot(int slot) {
-		return this.hats[slot];
-	}
-	
-	void  SetPaintForSlot(int slot, float paint) {
-		this.values[slot] = paint;
-	}
-	
-	void  SetHatForSlot(int slot, int iItemDefinitionIndex) {
-		this.hats[slot] = iItemDefinitionIndex;
-	}
-	
-	int   GetSlot() {
-		return this.tSlot;
-	}
-	
-	void  SetSlot(int slot) {
-		this.tSlot = slot;
-	}
 }
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
@@ -74,20 +57,6 @@ Handle hRegen = INVALID_HANDLE;
 // Networkable Server Offsets (used for regen)
 int clipOff;
 int ammoOff;
-
-// Paints menu. Generated ONCE.
-Menu PaintsMenu;
-
-// Paint names.
-char paintNames[30][64] = {
-	"No Paint", "Indubitably Green", "Zepheniah's Greed", "Noble Hatter's Violet", "Color No. 216-190-216", "A Deep Commitment to Purple",
-	"Mann Co. Orange", "Muskelmannbraun", "Peculiarly Drab Tincture", "Radigan Conagher Brown", "Ye Olde Rustic Colour",
-	"Australium Gold", "Aged Moustache Grey", "An Extraordinary Abundance of Tinge", "A Distinctive Lack of Hue", "Pink as Hell",
-	"A Color Similar to Slate", "Drably Olive", "The Bitter Taste of Defeat and Lime", "The Color of a Gentlemann's Business Pants",
-	"Dark Salmon Injustice", "A Mann's Mint", "After Eight",
-	"Team Spirit", "Operator's Overalls", "Waterlogged Lab Coat", "Balaclavas Are Forever", "An Air of Debonair", "The Value of Teamwork",
-	"Cream Spirit"
-};
 
 // Paint Values (individual colors)
 int paintColors[23] = {
@@ -115,18 +84,9 @@ public void OnPluginStart()
 	hRegen = EndPrepSDKCall();
 	// This piece of code makes an SDKCall for the Regenerate function inside the game's gamedata.
 	// Refreshes the entire player to ensure Unusuals take effect instantly.
-}
-
-// Generates the paints menu once in a map lifetime.
-public void OnMapStart()
-{
-	GeneratePaintsMenu();
-}
-
-// Clean that menu handle after it ended, prevents memory leaks?
-public void OnMapEnd()
-{
-	delete PaintsMenu;
+	
+	LoadTranslations("paints.phrases.txt");
+	// Translations !
 }
 
 public Action CMD_Paint(int client, int args)
@@ -145,10 +105,10 @@ public int MainHdlr(Menu menu, MenuAction action, int client, int p2)
 			
 			int slot = p2, id = StringToInt(sel);
 			
-			PPlayer[client].SetSlot(slot);
-			PPlayer[client].SetHatForSlot(slot, id);
+			PPlayer[client].tSlot = slot;
+			PPlayer[client].hats[slot] = id;
 			
-			DisplayMenu(PaintsMenu, client, MENU_TIME_FOREVER);
+			GeneratePaintsMenu(client);
 		}
 	}
 	return 0;
@@ -161,11 +121,11 @@ public int PaintMgr(Menu menu, MenuAction action, int client, int p2)
 			char sel[32];
 			GetMenuItem(menu, p2, sel, sizeof(sel));
 			
-			int slot = PPlayer[client].GetSlot();
+			int slot = PPlayer[client].tSlot;
 			
 			bool isTeam = (StrContains(sel, "t", false) != -1);
 			
-			PPlayer[client].SetPaintForSlot(slot, isTeam ? -1.0 : StringToFloat(sel));
+			PPlayer[client].values[slot] = isTeam ? -1.0 : StringToFloat(sel);
 			
 			PPlayer[client].hasTeamPaint = isTeam;
 			PPlayer[client].teamIndex = (isTeam ? (p2 - 23) : 0);
@@ -173,16 +133,17 @@ public int PaintMgr(Menu menu, MenuAction action, int client, int p2)
 			AdministerPaint(client);
 		}
 	}
+	return 0;
 }
 
 public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDefinitionIndex, Handle& hItem)
 {
 	if (StrEqual(classname, "tf_wearable", false) && !IsWearableWeapon(iItemDefinitionIndex)) {
 		for (int i = 0; i < 3; i++) {
-			int hatId = PPlayer[client].GetHatForSlot(i);
+			int hatId = PPlayer[client].hats[i];
 			
 			if (hatId > 0 && iItemDefinitionIndex == hatId) {
-				float paint = PPlayer[client].GetPaintForSlot(i);
+				float paint = PPlayer[client].values[i];
 				
 				int flags = OVERRIDE_ALL | FORCE_GENERATION;
 					
@@ -228,50 +189,53 @@ void AdministerPaint(int client)
 
 public Action PaintTimer(Handle timer, any client)
 {
-	int hp = GetClientHealth(client), clip[2], ammo[2];
-	
-	clipOff = FindSendPropInfo("CTFWeaponBase", "m_iClip1");
-	ammoOff = FindSendPropInfo("CTFPlayer", "m_iAmmo");
-	
-	float uber = -1.0;
-	
-	if (TF2_GetPlayerClass(client) == TFClass_Medic)
-		uber = GetEntPropFloat(GetPlayerWeaponSlot(client, 1), Prop_Send, "m_flChargeLevel");
-	
-	for (int i = 0; i < sizeof(clip); i++) {
-		int wep = GetPlayerWeaponSlot(client, i);
-		if (wep != INVALID_ENT_REFERENCE) {
-			int ammoOff2 = GetEntProp(wep, Prop_Send, "m_iPrimaryAmmoType", 1) * 4 + ammoOff;
-			
-			clip[i] = GetEntData(wep, clipOff);
-			ammo[i] = GetEntData(wep, ammoOff2);
+	if (IsPlayerAlive(client)) {
+		int hp = GetClientHealth(client), clip[2], ammo[2];
+		
+		clipOff = FindSendPropInfo("CTFWeaponBase", "m_iClip1");
+		ammoOff = FindSendPropInfo("CTFPlayer", "m_iAmmo");
+		
+		float uber = -1.0;
+		
+		if (TF2_GetPlayerClass(client) == TFClass_Medic)
+			uber = GetEntPropFloat(GetPlayerWeaponSlot(client, 1), Prop_Send, "m_flChargeLevel");
+		
+		for (int i = 0; i < sizeof(clip); i++) {
+			int wep = GetPlayerWeaponSlot(client, i);
+			if (wep != INVALID_ENT_REFERENCE) {
+				int ammoOff2 = GetEntProp(wep, Prop_Send, "m_iPrimaryAmmoType", 1) * 4 + ammoOff;
+				
+				clip[i] = GetEntData(wep, clipOff);
+				ammo[i] = GetEntData(wep, ammoOff2);
+			}
+		}
+		
+		// Regenerate the player (SDK Call)
+		SDKCall(hRegen, client, 0);
+		
+		SetEntityHealth(client, hp);
+		if (uber > -1.0)
+			SetEntPropFloat(GetPlayerWeaponSlot(client, 1), Prop_Send, "m_flChargeLevel", uber);
+		
+		for (int i = 0; i < sizeof(clip); i++) {
+			int wep = GetPlayerWeaponSlot(client, i);
+			if (wep != INVALID_ENT_REFERENCE) {
+				int ammoOff2 = GetEntProp(wep, Prop_Send, "m_iPrimaryAmmoType", 1) * 4 + ammoOff;
+				
+				SetEntData(wep, clipOff, clip[i]);
+				SetEntData(wep, ammoOff2, ammo[i]);
+			}
 		}
 	}
-	
-	// Regenerate the player (SDK Call)
-	SDKCall(hRegen, client, 0);
-	
-	SetEntityHealth(client, hp);
-	if (uber > -1.0)
-		SetEntPropFloat(GetPlayerWeaponSlot(client, 1), Prop_Send, "m_flChargeLevel", uber);
-	
-	for (int i = 0; i < sizeof(clip); i++) {
-		int wep = GetPlayerWeaponSlot(client, i);
-		if (wep != INVALID_ENT_REFERENCE) {
-			int ammoOff2 = GetEntProp(wep, Prop_Send, "m_iPrimaryAmmoType", 1) * 4 + ammoOff;
-			
-			SetEntData(wep, clipOff, clip[i]);
-			SetEntData(wep, ammoOff2, ammo[i]);
-		}
-	}
+	delete timer;
 }
 
 // GenerateHatsMenu() - Generates the first menu where the player's hats are listed
 void GenerateHatsMenu(int client)
 {
-	Menu menu = CreateMenu(MainHdlr);
+	Menu menu = new Menu(MainHdlr);
 	
-	SetMenuTitle(menu, "Painted Hats Manager");
+	menu.SetTitle("%T", "Paint_MenuTitle", client);
 
 	int hat = -1, found = 0;
 	while ((hat = FindEntityByClassname(hat, "tf_wearable")) != -1) {
@@ -296,7 +260,7 @@ void GenerateHatsMenu(int client)
 						char hatName[42];
 						TF2IDB_GetItemName(id, hatName, sizeof(hatName));
 						
-						AddMenuItem(menu, idStr, hatName);
+						menu.AddItem(idStr, hatName);
 					}
 				}
 				found++;
@@ -304,32 +268,43 @@ void GenerateHatsMenu(int client)
 		}
 	}
 	
-	if (!found)
-		AddMenuItem(menu, "-", "No se encontraron hats compatibles.", ITEMDRAW_DISABLED);
+	if (!found) {
+		char errInc[128];
+		Format(errInc, sizeof(errInc), "%T", "Paint_ErrIncompatible", client);
 		
-	AddMenuItem(menu, "-", "- - - - - - - - - - - - - - - - - -", ITEMDRAW_DISABLED);
+		menu.AddItem("-", errInc, ITEMDRAW_DISABLED);
+	}
+		
+	menu.AddItem("-", "- - - - - - - - - - - - - - - - - -", ITEMDRAW_DISABLED);
 	
-	AddMenuItem(menu, "-", "Uso: Selecciona tu hat equipado y la pintura a utilizar.", ITEMDRAW_DISABLED);
+	char usage[128];
+	Format(usage, sizeof(usage), "%T", "Paint_Usage", client);
 	
-	SetMenuExitButton(menu, true);
-	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+	menu.AddItem("-", usage, ITEMDRAW_DISABLED);
+	
+	menu.ExitButton = true;
+	menu.Display(client, MENU_TIME_FOREVER);
 }
 
-// GeneratePaintsMenu() - Fills the Menu handle for paint values.
-void GeneratePaintsMenu()
+// GeneratePaintsMenu(int client) - Displays the available paints to the user.
+void GeneratePaintsMenu(int client)
 {
-	PaintsMenu = CreateMenu(PaintMgr);
+	Menu PaintsMenu = new Menu(PaintMgr);
 	
-	PaintsMenu.SetTitle("Select a paint...");
+	PaintsMenu.SetTitle("%T", "Paint_Edit_MenuTitle", client);
 	
-	for (int i = 0; i < sizeof(paintNames); i++) {
-		char valStr[42];
+	for (int i = 0; i < MAX_PAINTS; i++) {
+		char valStr[42], paintName[64];
 		(i < sizeof(paintColors)) ? IntToString(paintColors[i], valStr, sizeof(valStr)) : Format(valStr, sizeof(valStr), "t%d", i - 23);
 		
-		PaintsMenu.AddItem(valStr, paintNames[i]);
+		Format(paintName, sizeof(paintName), "Paint%d", i);
+		Format(paintName, sizeof(paintName), "%T", paintName, client);
+		
+		PaintsMenu.AddItem(valStr, paintName);
 	}
 	
 	PaintsMenu.ExitButton = true;
+	PaintsMenu.Display(client, MENU_TIME_FOREVER);
 }
 
 // IsWearableWeapon() - Checks if the wearable is in a weapon slot (so we don't count it as a hat)

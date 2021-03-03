@@ -7,7 +7,7 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define PLUGIN_VERSION "2.3.1"
+#define PLUGIN_VERSION "2.3.2"
 
 public Plugin myinfo = 
 {
@@ -27,9 +27,6 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	}
 }
 
-// Global Menu handle for effects.
-Menu glowMenu;
-
 // Per-Player effect variable to hold which effect they've selected.
 float clientEffect[MAXPLAYERS + 1] = 0.0;
 
@@ -39,6 +36,9 @@ public void OnPluginStart()
 	RegAdminCmd("sm_glowme",  CMD_UnuGlow, ADMFLAG_RESERVATION, "Opens the Unusual Glowing menu.");
 	
 	HookEvent("player_spawn", OnPlayerSpawn);
+	
+	LoadTranslations("unusualglow.phrases.txt");
+	// Translations !
 }
 
 public void OnMapStart()
@@ -46,9 +46,6 @@ public void OnMapStart()
 	for (int i = 0; i < sizeof(clientEffect); i++) {
 		clientEffect[i] = 0.0;
 	}
-	
-	delete glowMenu;
-	glowMenu = CreateGlowMenu();
 }
 
 public void OnClientConnected(int client)
@@ -73,7 +70,7 @@ public Action OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast)
 
 public Action CMD_UnuGlow(int client, int args)
 {
-	DisplayMenu(glowMenu, client, MENU_TIME_FOREVER);
+	CreateGlowMenu(client);
 	return Plugin_Handled;
 }
 
@@ -87,7 +84,9 @@ public int glowHdlr(Menu menu, MenuAction action, int client, int p2)
 			float eff = StringToFloat(sel);
 			
 			SetGlow(client, eff);
-			CPrintToChat(client, "{unusual}[UnuGlow] {white}Tus efectos se aplicarán cuando respawnees.");
+			
+			clientEffect[client] = eff;
+			CPrintToChat(client, "%T", "UnuGlow_Message", client);
 		}
 	}
 	return 0;

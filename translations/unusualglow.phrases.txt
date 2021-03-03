@@ -5,6 +5,17 @@
 		"en"		"{unusual}[UnuGlow] {white}Your effects will be applied on respawn."
 		"es"		"{unusual}[UnuGlow] {white}Tus efectos se aplicarán cuando respawnees."
 	}
+	"UnuGlow_MenuTitle"
+	{
+		"en"		"Unusual Glow Effects"
+		"es"		"Efectos de Brillo Inusual"
+	}
+
+	"UnuGlow0"
+	{
+		"en"		"No Effect"
+		"es"		"Sin Efecto"
+	}
 	"UnuGlow3041"
 	{
 		"en"		"Emerald Allurement"

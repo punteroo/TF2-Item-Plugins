@@ -1,3 +1,23 @@
+enum struct KsClient {
+	// Integer Array with selected type of Killstreak from our client.
+	int 	type[3];
+	// Same but for Sheens.
+	int 	sheen[3];
+	// Same but for Killstreakers.
+	int 	streaker[3];
+	
+	// Temporary slot integer for handling user selections.
+	int 	slot;
+	
+	// All Mode boolean.
+	bool 	all;
+}
+
+
+/*
+
+METHODMAPS SUCK COCK BRO
+
 methodmap KsClient < StringMap {
 	public KsClient() {
 		return view_as<KsClient>(new StringMap());
@@ -148,4 +168,4 @@ methodmap KsClient < StringMap {
 		
 		return all;
 	}
-}
+}*/

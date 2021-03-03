@@ -6,7 +6,7 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define PLUGIN_VERSION "2.3.1"
+#define PLUGIN_VERSION "2.3.2"
 
 /////////////////////
 // GLOBAL DECLARES //
@@ -27,7 +27,7 @@ bool AustraliumSE[MAXPLAYERS + 1] = false;
 int clientGold[MAXPLAYERS + 1] = 0;
 
 int goldWeps[3] =  { 264, 423, 169 };
-char goldNames[3][32] =  { "Golden Frying Pan", "Saxxy", "Golden Wrench" };
+char goldNames[3][32] =  { "Aus_SpecialWeps_GoldenPan", "Aus_SpecialWeps_Saxxy", "Aus_SpecialWeps_GoldenWrench" };
 
 /////////////////////
 /////////////////////
@@ -51,6 +51,9 @@ public void OnPluginStart()
 	HookEvent("player_spawn", OnItems);
 	// Hook to the items given / resupply event, this manages when to give the user their weapons.
 	// Also hook into the player_spawn event just in case post_inventory_application isn't called (happens sometimes)
+	
+	LoadTranslations("australiums.phrases.txt");
+	// Translations !
 }
 
 public void OnMapStart()
@@ -184,7 +187,7 @@ public int AussieHdlr(Menu menu, MenuAction action, int client, int p2)
 				Australium[client] = !Australium[client];
 				
 				// Check its state and reply to the user accordingly.
-				Australium[client] ? CPrintToChat(client, "{green}[VIP] {white}Se habilitó el modo {gold}Australium.") : CPrintToChat(client, "{red}[VIP] {white}Se deshabilitó el modo {gold}Australium.");
+				Australium[client] ? CPrintToChat(client, "%T", "Aus_Enabled", client) : CPrintToChat(client, "%T", "Aus_Disabled", client);
 				return 0;
 			}
 			
@@ -286,19 +289,31 @@ bool GiveAustralium(int client, char[] classname, int index, int level, int qual
 // OpenAustraliumMenu() - Opens an Australium preference menu.
 void OpenAustraliumMenu(int client)
 {
-	Menu menu = CreateMenu(AussieHdlr);
+	Menu menu = new Menu(AussieHdlr);
 	
-	SetMenuTitle(menu, "--Australium Mode--");
+	char title[64];
+	Format(title, 64, "%T", "Aus_MenuTitle", client);
 	
-	AddMenuItem(menu, "---", "Armas Especiales: Golden Pan, Saxxy y Golden Wrench.", ITEMDRAW_DISABLED);
+	menu.SetTitle(title);
 	
-	Australium[client] ? AddMenuItem(menu, "sw", "Modo Australium: ON") : AddMenuItem(menu, "sw", "Modo Australium: OFF");
+	char aEnabled[128], spwAlways[128], spw[128];
 	
-	AustraliumSE[client] ? AddMenuItem(menu, "ase", "¿Siempre dar armas especiales? (SI)") : AddMenuItem(menu, "ase", "¿Siempre dar armas especiales? (NO)");
+	Format(spw, 128, "%T", "Aus_SpecialWeps", client);
+	menu.AddItem("---", spw, ITEMDRAW_DISABLED);
+	
+	Format(aEnabled, 128, "%T", Australium[client] ? "Aus_Mode_On" : "Aus_Mode_Off", client);
+	menu.AddItem("sw", aEnabled);
+	
+	Format(spwAlways, 128, "%T", AustraliumSE[client] ? "Aus_SpecialWeps_GiveAlways_On" : "Aus_SpecialWeps_GiveAlways_Off", client);
+	menu.AddItem("ase", spwAlways);
 	
 	char goldWeapon[64];
-	if (clientGold[client] > -1)
-		Format(goldWeapon, sizeof(goldWeapon), "Arma Preferida: %s", goldNames[clientGold[client]]);
+	if (clientGold[client] > -1) {
+		char wep[128];
+		Format(wep, 128, "%T", goldNames[clientGold[client]], client);
+		
+		Format(goldWeapon, sizeof(goldWeapon), "%T", "Aus_SpecialWeps_Preffered", client, wep);
+	}
 	
 	AddMenuItem(menu, "gold", goldWeapon, (AustraliumSE[client] ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED));
 	
