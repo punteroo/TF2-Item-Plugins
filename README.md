@@ -39,6 +39,15 @@ In order for these plugins to work you need the following dependencies installed
 For compilation you require my custom includes provided in the repository, the includes from the dependencies mentioned above and the following includes as well:
 * [MoreColors](https://forums.alliedmods.net/showthread.php?t=185016)
 
+# Installation
+This was needed because too many people have asked me if they just drag & drop and that's it. Many people get the error ``Native TF2IDB_CustomQuery was not found.``, this is because my plugin pack utilizes [FlaminSarge's TF2IDB](https://github.com/FlaminSarge/tf2idb) and not the original one, as stated in the requirements section. I've included in both the repository source code and releases the compiled, correct version for **TF2IDB** to prevent this error.
+
+To begin the installation process, first generate the SQLite Item Database for TF2IDB; head over to the [original TF2IDB post](https://forums.alliedmods.net/showpost.php?p=2252182&postcount=1) and follow the stated instructions, run the Python script, then copy the **tf2idb.sq3** file to ``addons/sourcemod/data/sqlite/``.
+
+Read all the articles inside the [Requirements](https://github.com/punteroo/TF2-Item-Plugins#requirements) section and install them independently. the head over to the [Releases](https://github.com/punteroo/TF2-Item-Plugins/releases) section in this repository and download the latest one. **NOW** you can Drag & Drop the contents of the **.zip** into ``addons/sourcemod/``.
+
+If any error was present during installation, contact me through **Discord** and I'll help you out whenever I'm able to.
+
 # Plugin Pack Usage
 
 ## vip-australium
