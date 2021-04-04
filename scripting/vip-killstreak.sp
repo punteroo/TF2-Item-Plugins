@@ -8,7 +8,7 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define PLUGIN_VERSION "2.3.2"
+#define PLUGIN_VERSION "2.3.3"
 
 #define MAX_SHEENS 		8
 #define MAX_STREAKERS	8
@@ -300,8 +300,8 @@ void GenerateWeaponMenu(int client, int slot)
 	bool isAll = Ks[client].all;
 	
 	if (!isAll) {
-		char slotStr[4];
-		Format(slotStr, 4, "Ks_Slot_%d", slot);
+		char slotStr[32];
+		Format(slotStr, sizeof(slotStr), "Ks_Slot_%d", slot + 1);
 		
 		Format(title, sizeof(title), "%T", slotStr, client);
 	}
