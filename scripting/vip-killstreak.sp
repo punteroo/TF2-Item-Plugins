@@ -8,7 +8,7 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define PLUGIN_VERSION "2.3.3"
+#define PLUGIN_VERSION "2.3.4"
 
 #define MAX_SHEENS 		8
 #define MAX_STREAKERS	8
@@ -76,7 +76,7 @@ public Action Apply (Handle timer, any client)
 	
 	// ONLY APPLY KILLSTREAK EFFECTS IF THE PLAYER IS ALIVE
 	// Menus can be used even when dead, so we must make sure he doesn't fuck anything up on accident.
-	if (IsPlayerAlive(client) && IsClientInGame(client))
+	if (IsPlayerAlive(client) && IsClientInGame(client) && !IsFakeClient(client))
 		ApplyKillstreak(client);
 }
 
@@ -301,7 +301,7 @@ void GenerateWeaponMenu(int client, int slot)
 	
 	if (!isAll) {
 		char slotStr[32];
-		Format(slotStr, sizeof(slotStr), "Ks_Slot_%d", slot + 1);
+		Format(slotStr, sizeof(slotStr), "Ks_Slot_%d", (slot > 2) ? slot : slot + 1);
 		
 		Format(title, sizeof(title), "%T", slotStr, client);
 	}
