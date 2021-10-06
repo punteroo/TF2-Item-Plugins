@@ -1,4 +1,6 @@
 # TF2 Item Management Plugins
+**Note: I am currently re-writing these plugins for bug-fixing, new functionality, and a lot of improvements. Please, do open Issues if you find a bug that hasn't been documented yet. Thank you!**
+
 Some months ago I started developing private plugins for communities that modify items for the game. It **IS AGAINST TOS**, and I know this can't be released on **AlliedModders** because of such, but because **VALVe** doesn't care for their game and it's been 7 years since a token ban has been issued I'll be releasing these public.
 
 As @NiagaraDryGuy said once:
