@@ -34,10 +34,10 @@ char goldNames[3][32] =  { "Aus_SpecialWeps_GoldenPan", "Aus_SpecialWeps_Saxxy",
 /////////////////////
 
 public Plugin myinfo =  {
-	name = "[VIP Module] Australium Weapons", 
-	author = "Lucas 'puntero' Maza", 
-	description = "Australium weapons plugin for VIP members.", 
-	version = PLUGIN_VERSION, 
+	name = "[VIP Module] Australium Weapons",
+	author = "Lucas 'puntero' Maza",
+	description = "Australium weapons plugin for VIP members.",
+	version = PLUGIN_VERSION,
 	url = "https://forums.alliedmods.net/member.php?u=213425"
 };
 

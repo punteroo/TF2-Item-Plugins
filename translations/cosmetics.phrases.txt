@@ -1,0 +1,156 @@
+"Phrases"
+{
+	"Cosmetic_MenuTitle"
+	{
+		"en"		"Cosmetics Manager"
+		"es"		"Administrador de Cosméticos"
+	}
+	"Cosmetic_ErrIncompatible"
+	{
+		"en"		"Could not find compatible hats."
+		"es"		"No se encontraron hats compatibles."
+	}
+	"Cosmetic_HelpText"
+	{
+		"en"		"Usage: Select your desired hat to begin customization."
+		"es"		"Uso: Selecciona tu hat equipado para comenzar a personalizarlo."
+	}
+	
+	"Cosmetic_Int_MenuTitle"
+	{
+		"#format"	"{1:s}"
+		"en"		"Configuring: {1}"
+		"es"		"Configurando: {1}"
+	}
+	"Cosmetic_Int_Unusual"
+	{
+		"#format"	"{1:s}"
+		"en"		"Unusual Effect: {1}"
+		"es"		"Efecto Inusual: {1}"
+	}
+	"Cosmetic_Int_Paint"
+	{
+		"#format"	"{1:s}"
+		"en"		"Paint: {1}"
+		"es"		"Pintura: {1}"
+	}
+	"Cosmetic_Int_Other"
+	{
+		"en"		"Halloween Spells"
+		"es"		"Hechizos de Halloween"
+	}
+	"Cosmetic_Int_Reset"
+	{
+		"en"		"Reset to Default"
+		"es"		"Restaurar"
+	}
+	"Cosmetic_Int_ResetNotify"
+	{
+		"#format"	"{1:s}"
+		"en"		"Your overrides for the cosmetic '{1}' have been reset."
+		"es"		"Las modificaciones de tu cosmetico '{1}' se reiniciaron."
+	}
+	"Cosmetic_Int_NoneFound"
+	{
+		"en"		"No customization can be done to this hat. ¿How did you get here?"
+		"es"		"No se puede customizar este hat. ¿Cómo llegaste acá?"
+	}
+	
+	"Cosmetic_Other_MenuTitle"
+	{
+		"#format"	"{1:s}"
+		"en"		"Modifying: {1}"
+		"es"		"Modificando: {1}"
+	}
+	"Cosmetic_Other_Footprint"
+	{
+		"#format"	"{1:s}"
+		"en"		"Footprints: {1}"
+		"es"		"Huellas: {1}"
+	}
+	"Cosmetic_Other_SpellPaint"
+	{
+		"#format"	"{1:s}"
+		"en"		"Spell Paint: {1}"
+		"es"		"Pintura Embrujada: {1}"
+	}
+	
+	
+	
+	"Cosmetic_Other_SpellPaint_0"
+	{
+		"en"		"Die Job"
+		"es"		"Teñido de Muerte"
+	}
+	"Cosmetic_Other_SpellPaint_1"
+	{
+		"en"		"Chromatic Corruption"
+		"es"		"Corrupción Cromática"
+	}
+	"Cosmetic_Other_SpellPaint_2"
+	{
+		"en"		"Putrescent Pigmentation"
+		"es"		"Pigmentación Putrescente"
+	}
+	"Cosmetic_Other_SpellPaint_3"
+	{
+		"en"		"Spectral Spectrum"
+		"es"		"Espectro Espectral"
+	}
+	"Cosmetic_Other_SpellPaint_4"
+	{
+		"en"		"Sinister Staining"
+		"es"		"Coloración Siniestra"
+	}
+
+
+	"Cosmetic_Other_Footsteps_1"
+	{
+		"en"		"Team Spirit"
+		"es"		"Espíritu de Equipo"
+	}
+	"Cosmetic_Other_Footsteps_2"
+	{
+		"en"		"Headless Horseshoes"
+		"es"		"Herraduras del Decapitado"
+	}
+	"Cosmetic_Other_Footsteps_3100495"
+	{
+		"en"		"Corpse Gray"
+		"es"		"Gris Calavérico"
+	}
+	"Cosmetic_Other_Footsteps_5322826"
+	{
+		"en"		"Violent Violet"
+		"es"		"Violeta Violento"
+	}
+	"Cosmetic_Other_Footsteps_8208497"
+	{
+		"en"		"Bruised Purple"
+		"es"		"Púrpura Magullado"
+	}
+	"Cosmetic_Other_Footsteps_8421376"
+	{
+		"en"		"Gangreen"
+		"es"		"Verde Gangrena"
+	}
+	"Cosmetic_Other_Footsteps_13595446"
+	{
+		"en"		"Rotten Orange"
+		"es"		"Naranja Podrido"
+	}
+	
+	"Cosmetic_Eff_MenuTitle"
+	{
+		"#format"	"{1:s}"
+		"en"		"Select Effect for {1}"
+		"es"		"Seleccionar Efecto para {1}"
+	}
+	
+	"Cosmetic_Paint_MenuTitle"
+	{
+		"#format"	"{1:s}"
+		"en"		"Select Paint for {1}"
+		"es"		"Seleccionar Pintura para {1}"
+	}
+}

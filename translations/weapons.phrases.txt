@@ -1,0 +1,799 @@
+"Phrases"
+{
+	"0"
+	{
+	    "en"		"Red Rock Roscoe"
+	}
+ 	"102"
+	{
+	    "en"		"Wrapped Reviver Mk.II"
+	}
+ 	"104"
+	{
+	    "en"		"Carpet Bomber Mk.II"
+	}
+ 	"105"
+	{
+	    "en"		"Masked Mender Mk.II"
+	}
+ 	"106"
+	{
+	    "en"		"Woodland Warrior Mk.II"
+	}
+ 	"107"
+	{
+	    "en"		"107: (Unused) Purple Range"
+	}
+ 	"108"
+	{
+	    "en"		"108: (Unused) Sudden Flurry"
+	}
+ 	"109"
+	{
+	    "en"		"Forest Fire Mk.II"
+	}
+ 	"10"
+	{
+	    "en"		"King of the Jungle"
+	}
+ 	"112"
+	{
+	    "en"		"Backwoods Boomstick Mk.II"
+	}
+ 	"113"
+	{
+	    "en"		"Woodsy Widowmaker Mk.II"
+	}
+ 	"114"
+	{
+	    "en"		"Night Owl Mk.II"
+	}
+ 	"11"
+	{
+	    "en"		"Night Terror"
+	}
+ 	"120"
+	{
+	    "en"		"Iron Wood Mk.II"
+	}
+ 	"122"
+	{
+	    "en"		"Plaid Potshotter Mk.II"
+	}
+ 	"12"
+	{
+	    "en"		"Backwoods Boomstick"
+	}
+ 	"130"
+	{
+	    "en"		"Bovine Blazemaker Mk.II"
+	}
+ 	"139"
+	{
+	    "en"		"Civil Servant Mk.II"
+	}
+ 	"13"
+	{
+	    "en"		"Woodsy Widowmaker"
+	}
+ 	"143"
+	{
+	    "en"		"Smalltown Bringdown Mk.II"
+	}
+ 	"144"
+	{
+	    "en"		"Civic Duty Mk.II"
+	}
+ 	"14"
+	{
+	    "en"		"Night Owl"
+	}
+ 	"151"
+	{
+	    "en"		"Dead Reckoner Mk.II"
+	}
+ 	"15"
+	{
+	    "en"		"Tartan Torpedo"
+	}
+ 	"160"
+	{
+	    "en"		"Autumn Mk.II"
+	}
+ 	"161"
+	{
+	    "en"		"Nutcracker Mk.II"
+	}
+ 	"163"
+	{
+	    "en"		"Macabre Web Mk.II"
+	}
+ 	"16"
+	{
+	    "en"		"Rustic Ruiner"
+	}
+ 	"17"
+	{
+	    "en"		"Barn Burner"
+	}
+ 	"18"
+	{
+	    "en"		"Homemade Heater"
+	}
+ 	"19"
+	{
+	    "en"		"Lumber From Down Under"
+	}
+ 	"1"
+	{
+	    "en"		"Sand Cannon"
+	}
+ 	"200"
+	{
+	    "en"		"Bloom Buffed"
+	}
+ 	"201"
+	{
+	    "en"		"Quack Canvassed"
+	}
+ 	"202"
+	{
+	    "en"		"Bank Rolled"
+	}
+ 	"203"
+	{
+	    "en"		"Merc Stained"
+	}
+ 	"204"
+	{
+	    "en"		"Kill Covered"
+	}
+ 	"205"
+	{
+	    "en"		"Fire Glazed"
+	}
+ 	"206"
+	{
+	    "en"		"Pizza Polished"
+	}
+ 	"207"
+	{
+	    "en"		"Bonk Varnished"
+	}
+ 	"208"
+	{
+	    "en"		"Star Crossed"
+	}
+ 	"209"
+	{
+	    "en"		"Clover Camo'd"
+	}
+ 	"20"
+	{
+	    "en"		"Iron Wood"
+	}
+ 	"210"
+	{
+	    "en"		"Freedom Wrapped"
+	}
+ 	"211"
+	{
+	    "en"		"Cardboard Boxed"
+	}
+ 	"212"
+	{
+	    "en"		"Dream Piped"
+	}
+ 	"213"
+	{
+	    "en"		"Miami Element"
+	}
+ 	"214"
+	{
+	    "en"		"Neo Tokyo"
+	}
+ 	"215"
+	{
+	    "en"		"Geometrical Teams"
+	}
+ 	"217"
+	{
+	    "en"		"Bomber Soul"
+	}
+ 	"218"
+	{
+	    "en"		"Uranium"
+	}
+ 	"21"
+	{
+	    "en"		"Country Crusher"
+	}
+ 	"220"
+	{
+	    "en"		"Cabin Fevered"
+	}
+ 	"221"
+	{
+	    "en"		"Polar Surprise"
+	}
+ 	"223"
+	{
+	    "en"		"Hana"
+	}
+ 	"224"
+	{
+	    "en"		"Dovetailed"
+	}
+ 	"225"
+	{
+	    "en"		"Cosmic Calamity"
+	}
+ 	"226"
+	{
+	    "en"		"Hazard Warning"
+	}
+ 	"228"
+	{
+	    "en"		"Mosaic"
+	}
+ 	"22"
+	{
+	    "en"		"Plaid Potshotter"
+	}
+ 	"230"
+	{
+	    "en"		"Jazzy"
+	}
+ 	"232"
+	{
+	    "en"		"Alien Tech"
+	}
+ 	"234"
+	{
+	    "en"		"Damascus & Mahogany"
+	}
+ 	"235"
+	{
+	    "en"		"Skull Study"
+	}
+ 	"236"
+	{
+	    "en"		"Haunted Ghosts"
+	}
+ 	"237"
+	{
+	    "en"		"Spectral Shimmered"
+	}
+ 	"238"
+	{
+	    "en"		"Spirit of Halloween"
+	}
+ 	"239"
+	{
+	    "en"		"Horror Holiday"
+	}
+ 	"23"
+	{
+	    "en"		"Shot in the Dark"
+	}
+ 	"240"
+	{
+	    "en"		"Totally Boned"
+	}
+ 	"241"
+	{
+	    "en"		"Electroshocked"
+	}
+ 	"242"
+	{
+	    "en"		"Ghost Town"
+	}
+ 	"243"
+	{
+	    "en"		"Tumor Toasted"
+	}
+ 	"244"
+	{
+	    "en"		"Calavera Canvas"
+	}
+ 	"245"
+	{
+	    "en"		"Snow Covered"
+	}
+ 	"246"
+	{
+	    "en"		"Frost Ornamented"
+	}
+ 	"247"
+	{
+	    "en"		"Smissmas Village"
+	}
+ 	"248"
+	{
+	    "en"		"Igloo"
+	}
+ 	"249"
+	{
+	    "en"		"Seriously Snowed"
+	}
+ 	"24"
+	{
+	    "en"		"Blasted Bombardier"
+	}
+ 	"250"
+	{
+	    "en"		"Smissmas Camo"
+	}
+ 	"251"
+	{
+	    "en"		"Sleighin' Style"
+	}
+ 	"252"
+	{
+	    "en"		"Alpine"
+	}
+ 	"253"
+	{
+	    "en"		"Gift Wrapped"
+	}
+ 	"254"
+	{
+	    "en"		"Winterland Wrapped"
+	}
+ 	"255"
+	{
+	    "en"		"Helldriver"
+	}
+ 	"256"
+	{
+	    "en"		"Organ-ically Hellraised"
+	}
+ 	"257"
+	{
+	    "en"		"Spectrum Splattered"
+	}
+ 	"258"
+	{
+	    "en"		"Candy Coated"
+	}
+ 	"259"
+	{
+	    "en"		"Pumpkin Pied"
+	}
+ 	"25"
+	{
+	    "en"		"Reclaimed Reanimator"
+	}
+ 	"260"
+	{
+	    "en"		"Sweet Toothed"
+	}
+ 	"261"
+	{
+	    "en"		"Crawlspace Critters"
+	}
+ 	"262"
+	{
+	    "en"		"Portal Plastered"
+	}
+ 	"263"
+	{
+	    "en"		"Death Deluxe"
+	}
+ 	"264"
+	{
+	    "en"		"Raving Dead"
+	}
+ 	"265"
+	{
+	    "en"		"Eyestalker"
+	}
+ 	"266"
+	{
+	    "en"		"Spider's Cluster"
+	}
+ 	"267"
+	{
+	    "en"		"Gourdy Green"
+	}
+ 	"268"
+	{
+	    "en"		"Mummified Mimic"
+	}
+ 	"269"
+	{
+	    "en"		"Spider Season"
+	}
+ 	"26"
+	{
+	    "en"		"Antique Annihilator"
+	}
+ 	"270"
+	{
+	    "en"		"Gingerbread Winner"
+	}
+ 	"271"
+	{
+	    "en"		"Saccharine Striped"
+	}
+ 	"272"
+	{
+	    "en"		"Elfin Enamel"
+	}
+ 	"273"
+	{
+	    "en"		"Peppermint Swirl"
+	}
+ 	"275"
+	{
+	    "en"		"Snow Globalization"
+	}
+ 	"276"
+	{
+	    "en"		"Gifting Mann's Wrapping Paper"
+	}
+ 	"277"
+	{
+	    "en"		"Snowflake Swirled"
+	}
+ 	"278"
+	{
+	    "en"		"Smissmas Spycrabs"
+	}
+ 	"279"
+	{
+	    "en"		"Frozen Aurora"
+	}
+ 	"27"
+	{
+	    "en"		"Old Country"
+	}
+ 	"280"
+	{
+	    "en"		"Starlight Serenity"
+	}
+ 	"281"
+	{
+	    "en"		"Frosty Delivery"
+	}
+ 	"282"
+	{
+	    "en"		"Glacial Glazed"
+	}
+ 	"283"
+	{
+	    "en"		"Cookie Fortress"
+	}
+ 	"28"
+	{
+	    "en"		"American Pastoral"
+	}
+ 	"29"
+	{
+	    "en"		"Backcountry Blaster"
+	}
+ 	"2"
+	{
+	    "en"		"Wrapped Reviver"
+	}
+ 	"300"
+	{
+	    "en"		"Yeti Coated"
+	}
+ 	"301"
+	{
+	    "en"		"Park Pigmented"
+	}
+ 	"302"
+	{
+	    "en"		"Mannana Peeled"
+	}
+ 	"303"
+	{
+	    "en"		"Macaw Masked"
+	}
+ 	"304"
+	{
+	    "en"		"Sax Waxed"
+	}
+ 	"305"
+	{
+	    "en"		"Anodized Aloha"
+	}
+ 	"306"
+	{
+	    "en"		"Bamboo Brushed"
+	}
+ 	"307"
+	{
+	    "en"		"Tiger Buffed"
+	}
+ 	"308"
+	{
+	    "en"		"Croc Dusted"
+	}
+ 	"309"
+	{
+	    "en"		"PiÃ±a Polished"
+	}
+ 	"30"
+	{
+	    "en"		"Bovine Blazemaker"
+	}
+ 	"310"
+	{
+	    "en"		"Leopard Printed"
+	}
+ 	"31"
+	{
+	    "en"		"War Room"
+	}
+ 	"32"
+	{
+	    "en"		"Treadplate Tormenter"
+	}
+ 	"33"
+	{
+	    "en"		"Bogtrotter"
+	}
+ 	"34"
+	{
+	    "en"		"Earth, Sky and Fire"
+	}
+ 	"35"
+	{
+	    "en"		"Hickory Hole-Puncher"
+	}
+ 	"36"
+	{
+	    "en"		"Spruce Deuce"
+	}
+ 	"37"
+	{
+	    "en"		"Team Sprayer"
+	}
+ 	"38"
+	{
+	    "en"		"Rooftop Wrangler"
+	}
+ 	"390"
+	{
+	    "en"		"Dragon Slayer"
+	}
+ 	"391"
+	{
+	    "en"		"Smissmas Sweater"
+	}
+ 	"39"
+	{
+	    "en"		"Civil Servant"
+	}
+ 	"3"
+	{
+	    "en"		"Psychedelic Slugger"
+	}
+ 	"40"
+	{
+	    "en"		"Citizen Pain"
+	}
+ 	"41"
+	{
+	    "en"		"Local Hero"
+	}
+ 	"42"
+	{
+	    "en"		"Mayor"
+	}
+ 	"43"
+	{
+	    "en"		"Smalltown Bringdown"
+	}
+ 	"44"
+	{
+	    "en"		"Civic Duty"
+	}
+ 	"45"
+	{
+	    "en"		"Liquid Asset"
+	}
+ 	"46"
+	{
+	    "en"		"Black Dahlia"
+	}
+ 	"47"
+	{
+	    "en"		"Lightning Rod"
+	}
+ 	"48"
+	{
+	    "en"		"Pink Elephant"
+	}
+ 	"49"
+	{
+	    "en"		"Flash Fryer"
+	}
+ 	"4"
+	{
+	    "en"		"Carpet Bomber"
+	}
+ 	"50"
+	{
+	    "en"		"Spark of Life"
+	}
+ 	"51"
+	{
+	    "en"		"Dead Reckoner"
+	}
+ 	"52"
+	{
+	    "en"		"Shell Shocker"
+	}
+ 	"53"
+	{
+	    "en"		"Current Event"
+	}
+ 	"54"
+	{
+	    "en"		"Turbine Torcher"
+	}
+ 	"55"
+	{
+	    "en"		"Brick House"
+	}
+ 	"56"
+	{
+	    "en"		"Sandstone Special"
+	}
+ 	"57"
+	{
+	    "en"		"Aqua Marine"
+	}
+ 	"58"
+	{
+	    "en"		"Low Profile"
+	}
+ 	"59"
+	{
+	    "en"		"Thunderbolt"
+	}
+ 	"5"
+	{
+	    "en"		"Masked Mender"
+	}
+ 	"60"
+	{
+	    "en"		"Autumn"
+	}
+ 	"61"
+	{
+	    "en"		"Nutcracker"
+	}
+ 	"62"
+	{
+	    "en"		"Pumpkin Patch"
+	}
+ 	"63"
+	{
+	    "en"		"Macabre Web"
+	}
+ 	"64"
+	{
+	    "en"		"Boneyard"
+	}
+ 	"65"
+	{
+	    "en"		"Wildwood"
+	}
+ 	"66"
+	{
+	    "en"		"Balloonicorn"
+	}
+ 	"67"
+	{
+	    "en"		"Rainbow"
+	}
+ 	"68"
+	{
+	    "en"		"Sweet Dreams"
+	}
+ 	"69"
+	{
+	    "en"		"Blue Mew"
+	}
+ 	"6"
+	{
+	    "en"		"Woodland Warrior"
+	}
+ 	"70"
+	{
+	    "en"		"Brain Candy"
+	}
+ 	"71"
+	{
+	    "en"		"Stabbed to Hell"
+	}
+ 	"72"
+	{
+	    "en"		"Flower Power"
+	}
+ 	"73"
+	{
+	    "en"		"Mister Cuddles"
+	}
+ 	"74"
+	{
+	    "en"		"Shot to Hell"
+	}
+ 	"75"
+	{
+	    "en"		"Torqued to Hell"
+	}
+ 	"76"
+	{
+	    "en"		"Coffin Nail"
+	}
+ 	"77"
+	{
+	    "en"		"Top Shelf"
+	}
+ 	"78"
+	{
+	    "en"		"Dressed to Kill"
+	}
+ 	"79"
+	{
+	    "en"		"High Roller's"
+	}
+ 	"7"
+	{
+	    "en"		"Purple Range"
+	}
+ 	"80"
+	{
+	    "en"		"Warhawk"
+	}
+ 	"81"
+	{
+	    "en"		"Blitzkrieg"
+	}
+ 	"82"
+	{
+	    "en"		"Airwolf"
+	}
+ 	"83"
+	{
+	    "en"		"Corsair"
+	}
+ 	"84"
+	{
+	    "en"		"Butcher Bird"
+	}
+ 	"85"
+	{
+	    "en"		"Killer Bee"
+	}
+ 	"86"
+	{
+	    "en"		"Red Bear"
+	}
+ 	"8"
+	{
+	    "en"		"Sudden Flurry"
+	}
+ 	"91"
+	{
+	    "en"		"Rainbow"
+	}
+ 	"92"
+	{
+	    "en"		"Killer Bee"
+	}
+ 	"93"
+	{
+	    "en"		"Coffin Nail"
+	}
+ 	"9"
+	{
+	    "en"		"Forest Fire"
+	}
+}
