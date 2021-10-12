@@ -393,7 +393,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
 					TF2Items_SetAttribute(hItem, 5, 1005, float(foot));
 					
 				// do they have a custom override for voice modulation?
-				int voices = view_as<int>(pCosmetics[client].sVoices[i]]);
+				int voices = view_as<int>(pCosmetics[client].sVoices[i]);
 				TF2Items_SetAttribute(hItem, 6, 1006, voices ? float(voices) : float(orgCosmetics[client][i].sVoices));
 				return Plugin_Changed;
 			}

@@ -357,8 +357,8 @@ void AddUnusuals(Menu menu, int client)
 			char system[64];
 			TF2Econ_GetParticleAttributeSystemName(id, system, sizeof(system));
 			
-			if (CV_Cosmetics_UParticles.BoolValue)
-				LogError("[TF2Cosmetics] Failure when adding particle %d (%s), might be new or undocumented; missing translation '%s'. This particle will be skipped!", id, system, name);
+			//if (CV_Cosmetics_UParticles.BoolValue)
+			LogError("[TF2Cosmetics] Failure when adding particle %d (%s), might be new or undocumented; missing translation '%s'. This particle will be skipped!", id, system, name);
 			continue;
 		}
 		

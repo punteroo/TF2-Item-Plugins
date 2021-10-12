@@ -2,11 +2,13 @@
 #include "tf2items/tf2item_base.inc"
 
 // Bit Values for Spells
-#define WeaponSpell_Excorcism          (1 << 0)
+#define WeaponSpell_Exorcism           (1 << 0)
 #define WeaponSpell_SquashRockets      (1 << 1)
 #define WeaponSpell_SpectralFlames     (1 << 2)
 #define WeaponSpell_SentryQuadPumpkins (1 << 3)
 #define WeaponSpell_GourdGrenades      (1 << 4)
+
+#define WeaponSpell_Explosions         (WeaponSpell_SquashRockets | WeaponSpell_SentryQuadPumpkins | WeaponSpell_GourdGrenades)
 
 // Custom Defines
 #define MAX_WEAPONS            3
@@ -16,7 +18,7 @@
 //
 //  Represents a single weapon instance for the user.
 //  This is utilized to define each original weapon's properties if overrides are not set.
-enum struct Cosmetic {
+enum struct Weapon {
 	int iItemIndex;
 	
 	int uEffects;
@@ -33,6 +35,30 @@ enum struct Cosmetic {
 	
 	// Spells [Bitfield]
 	int sSpells;
+	
+	// Original Quality
+	int iQuality;
+	
+	void Popularize(int iItemDefinitionIndex = -1, int uEffect = -1, int wPaint = -1, float wWear = -1.0, bool Aussie = false, bool Festive = false, int kType = -1,
+					int kSheen = -1, int kStreaker = -1, int sSpells = -1, int iQuality = -1) {
+		this.iItemIndex = iItemDefinitionIndex;
+		
+		this.uEffects = uEffect;
+		
+		this.wPaint = wPaint;
+		this.wWear  = wWear;
+		
+		this.Aussie  = Aussie;
+		this.Festive = Festive;
+		
+		this.kType     = kType;
+		this.kSheen    = kSheen;
+		this.kStreaker = kStreaker;
+		
+		this.sSpells = sSpells;
+		
+		this.iQuality = iQuality;
+	}
 }
 
 // WeaponsInfo
@@ -94,6 +120,33 @@ enum struct WeaponsInfo {
 	
 	// Spells [Bitfield]
 	int sSpells[3];
+	
+	/*
+	 * void ResetAll()
+	 *	Called to reset everything on the weapon. All is set to -1.
+	 */
+	void ResetAll() {
+		for (int i = 0; i < 3; i++)
+			this.ResetFor(i);
+	}
+	
+	void ResetFor(int slot) {
+		this.iItemIndex[slot] = -1;
+		
+		this.uEffects[slot]   = -1;
+		
+		this.wPaint[slot]     = -1;
+		this.wWear[slot]      = -1.0;
+		
+		this.Aussie[slot]     = false;
+		this.Festive[slot]    = false;
+		
+		this.kType[slot]      = -1;
+		this.kSheen[slot]     = -1;
+		this.kStreaker[slot]  = -1;
+		
+		this.sSpells[slot]    = 0;
+	}
 }
 
 //
@@ -114,6 +167,9 @@ void mMainMenu(int client) {
 			
 			int iItemDefinitionIndex = GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex");
 			
+			// will turn the stock weapon ID to a strange variant (if it fails it doesn't matter, value remains unchanged)
+			StockToStrange(iItemDefinitionIndex);
+			
 			Format(idStr, sizeof(idStr), "%d", iItemDefinitionIndex);
 			TF2Econ_GetItemName(iItemDefinitionIndex, name, sizeof(name));
 			
@@ -121,117 +177,9 @@ void mMainMenu(int client) {
 		}
 	}
 	
-	menu.AddItem("-", "Usage: Select your desired weapon and start fiddling!");
+	menu.AddItem("-", "Usage: Select your desired weapon and start fiddling!", ITEMDRAW_DISABLED);
 	
 	menu.ExitButton = true;
-	menu.Display(client, MENU_TIME_FOREVER);
-}
-
-// wMainMenu - Main menu for selected weapons; shows a resume of what can be modified on it and what can't (according to compatibility).
-void wMainMenu(int client, int iItemDefinitionIndex, int slot) {
-	Menu menu = new Menu(wepHdlr);
-	
-	char name[64], idStr[12], slotStr[2];
-	TF2Econ_GetItemName(iItemDefinitionIndex, name, sizeof(name));
-	IntToString(iItemDefinitionIndex, idStr, sizeof(idStr));
-	IntToString(slot, slotStr, sizeof(slotStr));
-	
-	menu.SetTitle("What will you modify on %s?", name);
-	
-	// Menu Data Embedding
-	menu.AddItem(idStr, "", ITEMDRAW_IGNORE);
-	menu.AddItem(slotStr, "", ITEMDRAW_IGNORE);
-	
-	bool sameItem = pWeapons[client].iItemIndex[slot] == iItemDefinitionIndex;
-	
-	////////////////////////////////////////////////////////
-	// Can be Australium?
-	bool isAussie = pWeapons[client].Aussie[slot], canAussie = CanBeAustralium(iItemDefinitionIndex);
-	
-	menu.AddItem("a", (isAussie && canAussie && sameItem) ? "Australium: [X]" : "Australium: [ ]", canAussie ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
-	
-	// Can be Festivized?
-	bool isFestive = pWeapons[client].Festive[slot], canFestive = CanBeFestivized(iItemDefinitionIndex);
-	
-	menu.AddItem("f", (isFestive && canFestive && sameItem) ? "Festivized: [X]" : "Festivized: [ ]", canFestive ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
-	
-	// Can be War Painted?
-	int wPaint = pWeapons[client].wPaint[slot], canWar = CanBePainted(iItemDefinitionIndex);
-	
-	char wPaintName[128];
-	if (wPaint > -1) {
-		char wPaintWear[128];
-		GetWarPaintWearName(pWeapons[client].wWear[slot]);
-		
-		Format(wPaintName, sizeof(wPaintName), "%d", wPaint);
-		
-		// If a translation for this War Paint exists, we use it. Else, just set it as unknown.
-		// There shouldn't be EVER a case where a War Paint is Unknown. This is because selectable War Paints are checked before adding them to the menu.
-		if (TranslationPhraseExists(wPaintName) && sameItem)
-			Format(wPaintName, sizeof(wPaintName), "War Paint: %T (Wear: %s)", wPaintName, client, wPaintWear);
-		else
-			Format(wPaintName, sizeof(wPaintName), "War Paint: Unknown (Wear: %s)", wPaintWear);
-	}
-	
-	menu.AddItem("w", strlen(wPaintName) > 0 ? wPaintName : "War Paint: N/A", canWar ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
-	
-	// Now, here comes everything that's always appliable.
-	// Killstreak Effects
-	menu.AddItem("k", "Killstreak Effects");
-	
-	// Unusual Effects
-	int uEffect = pWeapons[client].uEffects[slot];
-	char uName[64];
-	GetUnusualWeaponName(sameItem ? uEffect : -1, uName, sizeof(uName));
-	
-	Format(uName, sizeof(uName), "Unusual Effect: %s", uName);
-	
-	menu.AddItem("u", uName);
-	
-	// Halloween Spells (only Exorcism is always appliable)
-	menu.AddItem("s", "Halloween Spells");
-	
-	menu.ExitBackButton = true;
-	menu.Display(client, MENU_TIME_FOREVER);
-}
-
-// wWarPaint - Menu that allows players to select their War Paint settings (Specific protodef ID and wear value)
-void wWarPaint(int client, int iItemDefinitionIndex, int slot) {
-	Menu menu = new Menu(wPaintHdlr);
-	
-	char name[64], idStr[12], slotStr[2];
-	TF2Econ_GetItemName(iItemDefinitionIndex, name, sizeof(name));
-	IntToString(iItemDefinitionIndex, idStr, sizeof(idStr));
-	IntToString(slot, slotStr, sizeof(slotStr));
-	
-	menu.SetTitle("War Paint Settings for %s", name);
-	
-	// Menu Data Embedding
-	menu.AddItem(idStr, "", ITEMDRAW_IGNORE);
-	menu.AddItem(slotStr, "", ITEMDRAW_IGNORE);
-	
-	bool sameItem = pWeapons[client].iItemIndex[slot] == iItemDefinitionIndex;
-	
-	// Actual options
-	int   wPaint = pWeapons[client].wPaint[slot];
-	float wear   = pWeapons[client].wWear[slot];
-	
-	char wPaintName[128], wPaintWearName[128];
-	// Format War Paint Display String
-	Format(wPaintName, sizeof(wPaintName), "%d", wPaint);
-	if (TranslationPhraseExists(wPaintName) && sameItem)
-		Format(wPaintName, sizeof(wPaintName), "War Paint: %T", wPaintName, client);
-	else
-		Format(wPaintName, sizeof(wPaintName), "War Paint: No Override");
-	
-	// Format Wear Display String
-	GetWarPaintWearName(sameItem ? wear : -1.0, wPaintWearName, sizeof(wPaintWearName));
-	Format(wPaintWearName, sizeof(wPaintWearName), "War Paint Wear: %s", wPaintWearName);
-	
-	menu.AddItem("p", wPaintName);
-	menu.AddItem("w", wPaintWearName);
-	
-	menu.ExitBackButton = true;
 	menu.Display(client, MENU_TIME_FOREVER);
 }
 
@@ -256,7 +204,7 @@ void wWarPaintProtodef(int client, int iItemDefinitionIndex, int slot) {
 	ArrayList paints = TF2Econ_GetPaintKitDefinitionList();
 	for (int i = 0; i < paints.Length; i++) {
 		char pStr[12];
-		IntToString(paints.Get(i));
+		IntToString(paints.Get(i), pStr, sizeof(pStr));
 		
 		if (TranslationPhraseExists(pStr)) {
 			char pName[64];
@@ -294,60 +242,6 @@ void wWarPaintWear(int client, int iItemDefinitionIndex, int slot) {
 		
 		menu.AddItem(values[i], wPaintWearName);
 	}
-	
-	menu.ExitBackButton = true;
-	menu.Display(client, MENU_TIME_FOREVER);
-}
-
-// kKillstreaks - Main Killstreak effects menu. Allows the user to visualize their Killstreak effects preferences currently set.
-void kKillstreaks(int client, int iItemDefinitionIndex, int slot) {
-	Menu menu = new Menu(kKillstreakHdlr);
-	
-	char name[64], idStr[12], slotStr[2];
-	TF2Econ_GetItemName(iItemDefinitionIndex, name, sizeof(name));
-	IntToString(iItemDefinitionIndex, idStr, sizeof(idStr));
-	IntToString(slot, slotStr, sizeof(slotStr));
-	
-	menu.SetTitle("Killstreak Preferences for %s", name);
-	
-	// Menu Data Embedding
-	menu.AddItem(idStr, "", ITEMDRAW_IGNORE);
-	menu.AddItem(slotStr, "", ITEMDRAW_IGNORE);
-	
-	bool sameItem = pWeapons[client].iItemIndex[slot] == iItemDefinitionIndex;
-	
-	// Killstreak Type
-	int type = pWeapons[client].kType[slot];
-	char kTypeName[128];
-	
-	GetKillstreakTypeName(sameItem ? type : -1, kTypeName, sizeof(kTypeName));
-	Format(kTypeName, sizeof(kTypeName), "Killstreak Type: %s", kTypeName);
-	
-	menu.AddItem("t", kTypeName);
-	
-	// Killstreak Sheen (Depends on the type, this will either be disabled or enabled for selection)
-	// It is also checked the user has a correct Killstreak type set to apply an overriden sheen/streaker.
-	//
-	// TODO: identify original killstreak type to allow sheen and killstreaker overrides without enforcing a type
-	//
-	int sheen = pWeapons[client].kSheen[slot];
-	char kSheenName[128];
-	
-	GetSheenName(sameItem ? sheen : -1, kSheenName, sizeof(kSheenName));
-	Format(kSheenName, sizeof(kSheenName), "Sheen: %s", kSheenName);
-	
-	menu.AddItem("s", kSheenName, (1 < type <= 3) ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
-	
-	// Killstreaker (same as sheen, only this time it MUST BE 3)
-	int killstreaker = pWeapons[client].kStreaker[slot];
-	char kStreakerName[128];
-	
-	GetKillstreakerName(sameItem ? killstreaker : -1, kStreakerName, sizeof(kStreakerName));
-	Format(kStreakerName, sizeof(kStreakerName), "Killstreaker: %s", kStreakerName);
-	
-	menu.AddItem("k", kStreakerName, (type == 3) ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
-	
-	// Done!
 	
 	menu.ExitBackButton = true;
 	menu.Display(client, MENU_TIME_FOREVER);
@@ -425,51 +319,10 @@ void wUnusual(int client, int iItemDefinitionIndex, int slot) {
 	static const char unusuals[][] = { "-1", "701", "702", "703", "704" };
 	for (int i = 0; i < sizeof(unusuals); i++) {
 		char wUnusualName[64];
-		GetSheenName(StringToInt(unusuals[i]), wUnusualName, sizeof(wUnusualName));
+		GetUnusualWeaponName(StringToInt(unusuals[i]), wUnusualName, sizeof(wUnusualName));
 		
 		menu.AddItem(unusuals[i], wUnusualName);
 	}
-	
-	menu.ExitBackButton = true;
-	menu.Display(client, MENU_TIME_FOREVER);
-}
-
-// wSpells - Allows a player to set Halloween Spells on their weapon (if applicable)
-void wSpells(int client, int iItemDefinitionIndex, int slot) {
-	Menu menu = new Menu(wSpellsHdlr);
-	
-	char name[64], idStr[12], slotStr[2];
-	TF2Econ_GetItemName(iItemDefinitionIndex, name, sizeof(name));
-	IntToString(iItemDefinitionIndex, idStr, sizeof(idStr));
-	IntToString(slot, slotStr, sizeof(slotStr));
-	
-	menu.SetTitle("Toggling Spells on %s", name);
-	
-	// Menu Data Embedding
-	menu.AddItem(idStr, "", ITEMDRAW_IGNORE);
-	menu.AddItem(slotStr, "", ITEMDRAW_IGNORE);
-	
-	// Time to see applicability
-	int spells = pWeapons[client].sSpells; // Spell Bitfield
-	TFClassType class = TF2_GetPlayerClass(client);
-	
-	bool sameItem = pWeapons[client].iItemIndex[slot] == iItemDefinitionIndex;
-	
-	// Exorcism can always be applied
-	menu.AddItem("e", (spells & WeaponSpell_Excorcism && sameItem) ? "Exorcism: [X]" : "Exorcism: [ ]");
-	
-	// Squash Rockets (Only on Soldier Primaries)
-	// Since "slot" is relative to the weapon slot, we can compare it.
-	menu.AddItem("r", (spells & WeaponSpell_SquashRockets && sameItem) ? "Squash Rockets: [X]" : "Squash Rockets: [ ]", (class == TFClass_Soldier && slot == 0) ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
-	
-	// Spectral Flames (Only on Pyro Primaries)
-	menu.AddItem("f", (spells & WeaponSpell_SpectralFlames && sameItem) ? "Spectral Flames: [X]" : "Spectral Flames: [ ]", (class == TFClass_Pyro && slot == 0) ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
-	
-	// Sentry Quad Pumpkins (Only on Engineer Melee)
-	menu.AddItem("s", (spells & WeaponSpell_SentryQuadPumpkins && sameItem) ? "Sentry Quad-Pumpkins: [X]" : "Sentry Quad-Pumpkins: [ ]", (class == TFClass_Engineer && slot == 2) ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
-	
-	// Gourd Grenades (Only on Demoman Primaries & Secondaries)
-	menu.AddItem("g", (spells & WeaponSpell_GourdGrenades && sameItem) ? "Gourd Grenades: [X]" : "Gourd Grenades: [ ]", (class == TFClass_DemoMan && (0 <= slot <= 1)) ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
 	
 	menu.ExitBackButton = true;
 	menu.Display(client, MENU_TIME_FOREVER);
@@ -486,12 +339,12 @@ void wSpells(int client, int iItemDefinitionIndex, int slot) {
  */
 void GetKillstreakTypeName(int type, char[] buffer, int size) {
 	switch (type) {
-		case -1: StrCopy(buffer, size, "No Override");
-		case 0:  StrCopy(buffer, size, "Disabled");
-		case 1:  StrCopy(buffer, size, "Basic");
-		case 2:  StrCopy(buffer, size, "Specialized");
-		case 3:  StrCopy(buffer, size, "Professional");
-		default: StrCopy(buffer, size, "Unknown");
+		case -1: strcopy(buffer, size, "No Override");
+		case 0:  strcopy(buffer, size, "Disabled");
+		case 1:  strcopy(buffer, size, "Basic");
+		case 2:  strcopy(buffer, size, "Specialized");
+		case 3:  strcopy(buffer, size, "Professional");
+		default: strcopy(buffer, size, "Unknown");
 	}
 }
 
@@ -502,16 +355,16 @@ void GetKillstreakTypeName(int type, char[] buffer, int size) {
  */
 void GetSheenName(int sheen, char[] buffer, int size) {
 	switch (sheen) {
-		case -1: StrCopy(buffer, size, "No Override");
-		case 0:  StrCopy(buffer, size, "Disabled");
-		case 1:  StrCopy(buffer, size, "Team Shine");
-		case 2:  StrCopy(buffer, size, "Deadly Daffodil");
-		case 3:  StrCopy(buffer, size, "Manndarin");
-		case 4:  StrCopy(buffer, size, "Mean Green");
-		case 5:  StrCopy(buffer, size, "Agonizing Emerald");
-		case 6:  StrCopy(buffer, size, "Villanious Violet");
-		case 7:  StrCopy(buffer, size, "Hot Rod");
-		default: StrCopy(buffer, size, "Unknown");
+		case -1: strcopy(buffer, size, "No Override");
+		case 0:  strcopy(buffer, size, "Disabled");
+		case 1:  strcopy(buffer, size, "Team Shine");
+		case 2:  strcopy(buffer, size, "Deadly Daffodil");
+		case 3:  strcopy(buffer, size, "Manndarin");
+		case 4:  strcopy(buffer, size, "Mean Green");
+		case 5:  strcopy(buffer, size, "Agonizing Emerald");
+		case 6:  strcopy(buffer, size, "Villanious Violet");
+		case 7:  strcopy(buffer, size, "Hot Rod");
+		default: strcopy(buffer, size, "Unknown");
 	}
 }
 
@@ -522,16 +375,16 @@ void GetSheenName(int sheen, char[] buffer, int size) {
  */
 void GetKillstreakerName(int killstreaker, char[] buffer, int size) {
 	switch (killstreaker) {
-		case -1:   StrCopy(buffer, size, "No Override");
-		case 0:    StrCopy(buffer, size, "Disabled");
-		case 2002: StrCopy(buffer, size, "Fire Horns");
-		case 2003: StrCopy(buffer, size, "Cerebral Discharge");
-		case 2004: StrCopy(buffer, size, "Tornado");
-		case 2005: StrCopy(buffer, size, "Flames");
-		case 2006: StrCopy(buffer, size, "Singularity");
-		case 2007: StrCopy(buffer, size, "Incinerator");
-		case 2008: StrCopy(buffer, size, "Hypno-Beam");
-		default:   StrCopy(buffer, size, "Unknown");
+		case -1:   strcopy(buffer, size, "No Override");
+		case 0:    strcopy(buffer, size, "Disabled");
+		case 2002: strcopy(buffer, size, "Fire Horns");
+		case 2003: strcopy(buffer, size, "Cerebral Discharge");
+		case 2004: strcopy(buffer, size, "Tornado");
+		case 2005: strcopy(buffer, size, "Flames");
+		case 2006: strcopy(buffer, size, "Singularity");
+		case 2007: strcopy(buffer, size, "Incinerator");
+		case 2008: strcopy(buffer, size, "Hypno-Beam");
+		default:   strcopy(buffer, size, "Unknown");
 	}
 }
 
@@ -542,13 +395,13 @@ void GetKillstreakerName(int killstreaker, char[] buffer, int size) {
  */
 void GetWarPaintWearName(float wear, char[] buffer, int size) {
 	switch (wear) {
-		case -1.0:	   StrCopy(buffer, size, "No Override");
-		case 0.0, 0.2: StrCopy(buffer, size, "Factory New");
-		case 0.4: 	   StrCopy(buffer, size, "Minimal Wear");
-		case 0.6:	   StrCopy(buffer, size, "Field-Tested");
-		case 0.8:	   StrCopy(buffer, size, "Well-Worn");
-		case 1.0:	   StrCopy(buffer, size, "Battle Scarred");
-		default:	   StrCopy(buffer, size, "Unknown");
+		case -1.0:	   strcopy(buffer, size, "No Override");
+		case 0.0, 0.2: strcopy(buffer, size, "Factory New");
+		case 0.4: 	   strcopy(buffer, size, "Minimal Wear");
+		case 0.6:	   strcopy(buffer, size, "Field-Tested");
+		case 0.8:	   strcopy(buffer, size, "Well-Worn");
+		case 1.0:	   strcopy(buffer, size, "Battle Scarred");
+		default:	   strcopy(buffer, size, "Unknown");
 	}
 }
 
@@ -559,12 +412,12 @@ void GetWarPaintWearName(float wear, char[] buffer, int size) {
  */
 void GetUnusualWeaponName(int unusual, char[] buffer, int size) {
 	switch (unusual) {
-		case -1:  StrCopy(buffer, size, "No Override");
-		case 701: StrCopy(buffer, size, "Hot");
-		case 702: StrCopy(buffer, size, "Isotope");
-		case 703: StrCopy(buffer, size, "Cool");
-		case 704: StrCopy(buffer, size, "Energy Orb");
-		default:  StrCopy(buffer, size, "Unknown");
+		case -1:  strcopy(buffer, size, "No Override");
+		case 701: strcopy(buffer, size, "Hot");
+		case 702: strcopy(buffer, size, "Isotope");
+		case 703: strcopy(buffer, size, "Cool");
+		case 704: strcopy(buffer, size, "Energy Orb");
+		default:  strcopy(buffer, size, "Unknown");
 	}
 }
 
@@ -604,7 +457,7 @@ bool CanBePainted(int iItemDefinitionIndex) {
  *	Returns wether this iItemDefinitionIndex can be a valid Australium item.
  *  Makes use of the Stock->Strange Variant conversion if a Stock ID is detected.
  */
-bool CanBeAustralium(int iItemDefinitionIndex) {
+bool CanBeAustralium(int& iItemDefinitionIndex) {
 	switch (iItemDefinitionIndex) {
 		case 13, 18, 21, 19, 20, 15, 7, 29, 14, 16, 4: return StockToStrange(iItemDefinitionIndex);
 		case /* Unlockables */      						 45, 228, 38, 132, 424, 141, 36, 61,
@@ -619,13 +472,15 @@ bool CanBeAustralium(int iItemDefinitionIndex) {
  *	Grabs a referenced iItemDefinitionIndex instance and converts it to its Strange variant. Utilized to "australize" the weapon, as Australiums don't work on Stock IDs.
  *  Returns true if conversion was successful, false if an invalid Stock iItemDefinitionIndex was provided.
  */
-bool StockToStrange(int iItemDefinitionIndex) {
+bool StockToStrange(int& iItemDefinitionIndex) {
 	int oldId = iItemDefinitionIndex;
 	
 	switch (iItemDefinitionIndex) {
+		case 10, 12, 11, 9: iItemDefinitionIndex = 199;
 		case 13: iItemDefinitionIndex = 200;
 		case 18: iItemDefinitionIndex = 205;
 		case 21: iItemDefinitionIndex = 208;
+		case 22, 23: iItemDefinitionIndex = 209;
 		case 19: iItemDefinitionIndex = 206;
 		case 20: iItemDefinitionIndex = 207;
 		case 15: iItemDefinitionIndex = 202;
