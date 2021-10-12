@@ -1,9 +1,8 @@
 # TF2 Item Management Plugins
-**Note: I am currently re-writing these plugins for bug-fixing, new functionality, and a lot of improvements. Please, do open Issues if you find a bug that hasn't been documented yet. Thank you!**
 
 Some months ago I started developing private plugins for communities that modify items for the game. It **IS AGAINST TOS**, and I know this can't be released on **AlliedModders** because of such, but because **VALVe** doesn't care for their game and it's been 7 years since a token ban has been issued I'll be releasing these public.
 
-As @NiagaraDryGuy said once:
+As [404](https://github.com/404UNFca) said once:
 ```
 It technically is against the TOS, and using something like it could have potentially gotten your server blacklisted about 8-9 years ago. Nowadays, not so much. Many community servers in existence are using this system.
 
@@ -13,7 +12,6 @@ TF2 servers have not suffered any GLST token bans in many years. Even CS:GO serv
 
 Basically, by using this plugin, you are acknowledging that there is still the possibility that Valve could come around one day and blacklist your server. Don't blame me if such a thing happens either.
 ```
-
 [source](https://github.com/NiagaraDryGuy/TF2ServersidePlayerAttachmentFixer/blob/90c2a2f41cd8b4fc872de59d05114913064066cd/README.md#frequently-asked-question-yes-singular)
 
 I might make some other releases if people want things fixed or whatever. I just release them because keeping them private is worthless, they're already everywhere and even some other devs have made their own versions of this public as well.
@@ -25,10 +23,10 @@ If you have any doubts or want something else, just write it down on the **Issue
 
 # TODO
 - [x] Translations, for Spanish and English users.
-- [ ] Merge **vip-unusuals** with **vip-paints** to maintain functionality between them, as one removes the others' effects.
+- [X] Merge **vip-unusuals** with **vip-paints** to maintain functionality between them, as one removes the others' effects.
 - [ ] Implement preference saving on **vip-australium**, **vip-unusuals** and **vip-paints** so selected user effects are applied whenever the user re-joins the server. This would nullify the player from opening the menus again each map change to re-apply said preferences.
-- [ ] Fix Unusual Effects (custom or legit) not being kept after applying a custom paint effect, could probably be permanently fixed when the merge is applied.
-- [x] ~~Refresh handles upon re-loading to prevent plugin failing on late-load (reload, refresh or unload and load)~~ Replaced all ``Handle``s for ``enum struct``s.
+- [X] Fix Unusual Effects (custom or legit) not being kept after applying a custom paint effect, could probably be permanently fixed when the merge is applied.
+- [x] ~~Refresh handles upon re-loading to prevent plugin failing on late-load (reload, refresh or unload and load)~~ Replace all ``Handle``s for ``enum struct``s.
 - [x] Fix a **probably problematic** memory leak in **vip-unusuals**.
 
 # Requirements
@@ -36,63 +34,79 @@ If you have any doubts or want something else, just write it down on the **Issue
 In order for these plugins to work you need the following dependencies installed on your server:
 * [TF2Items](https://forums.alliedmods.net/showthread.php?t=115100)
 * [TF2Attributes](https://forums.alliedmods.net/showthread.php?t=210221)
-* [TF2IDB (FlaminSarge)](https://github.com/FlaminSarge/tf2idb)
+* [TF2EconData](https://forums.alliedmods.net/showthread.php?t=315011)
 
 For compilation you require my custom includes provided in the repository, the includes from the dependencies mentioned above and the following includes as well:
 * [MoreColors](https://forums.alliedmods.net/showthread.php?t=185016)
 
 # Installation
-This was needed because too many people have asked me if they just drag & drop and that's it. Many people get the error ``Native TF2IDB_CustomQuery was not found.``, this is because my plugin pack utilizes [FlaminSarge's TF2IDB](https://github.com/FlaminSarge/tf2idb) and not the original one, as stated in the requirements section. I've included in both the repository source code and releases the compiled, correct version for **TF2IDB** to prevent this error.
 
-To begin the installation process, first generate the SQLite Item Database for TF2IDB; head over to the [original TF2IDB post](https://forums.alliedmods.net/showpost.php?p=2252182&postcount=1) and follow the stated instructions, run the Python script, then copy the **tf2idb.sq3** file to ``addons/sourcemod/data/sqlite/``.
+As of **v3.0.0** TF2IDB is no longer required. Installation is literally a Drag & Drop of what's inside the **.zip** file.
 
 Read all the articles inside the [Requirements](https://github.com/punteroo/TF2-Item-Plugins#requirements) section and install them independently. the head over to the [Releases](https://github.com/punteroo/TF2-Item-Plugins/releases) section in this repository and download the latest one. **NOW** you can Drag & Drop the contents of the **.zip** into ``addons/sourcemod/``.
 
 If any error was present during installation, contact me through **Discord** and I'll help you out whenever I'm able to.
 
+# Updating
+
+Only update whenever a new **TF2 Update** fires (I know, weird but happens). I've written **.py** scripts inside the ``sourcemod/translations`` folder to update the **Unusual Effects** and **War Paint** names. The plugin checks for an existing translation phrase for each **ID**, if none is found the particle/protodef ID is skipped.
+
+You will require to run these **.py** scripts to update each of them.
+
+## Updating tf2item_cosmetics
+
+1. Head over to your **SourceMod** installation and into the ``translations`` folder.
+2. You should see a **Python Script** named [unusual_names_updater.py](https://github.com/punteroo/TF2-Item-Plugins/blob/production/translations/unusual_names_updater.py) (if not, click on the link and download it). Write down its absolute location (For ex.: ``C:/unusual_names_updater.py``)
+3. **NOTE:** The scripts' location is not important, it doesn't have to be in the translations folder.
+4. Fire up ``cmd`` as Administrator (or Terminal on an user with write and read rights to both files if on Linux) and ``cd`` into the script's location.
+5. Write ``py <script location> -tf <tf_english.txt location> -out <output location>`` and hit **ENTER**.
+6. **NOTE:** tf_english.txt is always located in your Team Fortress 2 installation at ``tf/resource/tf_english.txt``. For output, you can target anything and copy the file later to your SourceMod installation's ``translations`` folder. **Make sure the output filename is ``unusuals.phrases.txt``.**
+7. If everything goes well, the updated translations file should be outputted without any issues.
+
+## Updating tf2item_weapons
+
+The script is primitive. I will write an easier to use script later (PRs are also welcome).
+
+1. Head over to your **SourceMod** installation and into the ``translations`` folder.
+2. You should see a **Python Script** named [paintkits.py](https://github.com/punteroo/TF2-Item-Plugins/blob/production/translations/paintkits.py) (if not, click on the link and download it). Write down its absolute location (For ex.: ``C:/paintkits.py``)
+3. **NOTE:** The scripts' location is not important, it doesn't have to be in the translations folder.
+4. Create a ``.txt`` file named``paintkits.txt`` on the same directory as the script.
+5. Fill its contents with entries from the file ``tf_proto_obj_defs.txt`` that start with ``9_`` located in your ``tf/resource/`` folder inside your TF2 Installation.
+6. **NOTE:** There's an example entry file on the repo if you need an example for format. Those entries should look like this, just copy the ones that start with ``9_``:
+```
+	"9_0_field { field_number: 2 }"		"Red Rock Roscoe"
+	"9_100_field { field_number: 2 }"		"100: (Unused) Red Rock Roscoe"
+	"9_101_field { field_number: 2 }"		"101: (Unused) Sand Cannon"
+	"9_102_field { field_number: 2 }"		"Wrapped Reviver Mk.II"
+	"9_103_field { field_number: 2 }"		"103: (Unused) Psychedelic Slugger"
+	
+	...
+```
+8. The script will print out the translations content. Copy the scripts' output and create a file inside your SourceMod installation's ``translations`` folder named ``weapons.phrases.txt``.
+
 # Plugin Pack Usage
 
-## vip-australium
-* Controls players' weapons for Australium variants, and also enables them to have special weapons such as **The Golden Frying Pan**, **The Golden Wrench** and **The Saxxy**.
-* Users can open up a menu where they configurate their preferences. They **are not** saved, I may include preference saving on the next release.
+## tf2item_cosmetics
+* Players can customize their legit cosmetic items at will, applying Unusual effects, paint colors, spells and spell paints.
+* Overrides set by this plugin will always keep in mind original attributes, for ex.: _if you have a legit **Unusual Pomade Prince** with **Halloween Spell: Voices From Below** and **Molten Mallard** effect, they will not disappear when setting a paint colour on it, only when overriden by the same attribute (such as changing the Unusual effect to **Burning Flames**)_
 
 Command | Description | Example
 ----------- | ------------- | ----------
-sm_australium | Opens up the Australium weapons configuration menu. Highly customizable, not only for australium weapons but also special ones. | [YouTube Video Demonstration](https://youtu.be/b8KsEIfNUyQ?t=94)
-sm_aussie | Same as the command above, just shorter. | N/A
+sm_cosmetics | Opens up the Cosmetics Manager. | [YouTube Video Demonstration](https://www.youtube.com/watch?v=XsFySomgYYk)
+sm_hats | Same as the command above, just different | N/A
+sm_myhats | Same as the command above, just different | N/A
 
-## vip-killstreak
-* Controls players' weapons for Killstreak properties. It offers a **Sheen** (if **Specialized**) and **Killstreaker** (if **Professional**) effect selector for **each individual weapon**. This means that your primary, secondary and melee may have different types of Killstreaks and also different types of effects on each of them.
-* It also has an option to apply the same type and effects on every weapon. Everything is controlled by a menu.
-
-Command | Description | Example
------------ | ------------- | ----------
-sm_ks | Opens up the Killstreak configuration menu. Effects can be applied to each weapon individually, or activate a mode to set the same type, sheen and killstreaker on every weapon. | [YouTube Video Demonstration](https://youtu.be/b8KsEIfNUyQ?t=13)
-sm_killstreak | Same as the command above, just longer. | N/A
-sm_killstreaks | Same as the command above, just longer. | N/A
-
-## vip-unusuals
-* Controls players' cosmetics and applies selective Unusual effects on them. Works very similar to [vip-killstreak](https://github.com/punteroo/TF2-Item-Plugins/blob/production/scripting/vip-killstreak.sp) where you can select individual effects for each one of the compatible hats.
-* Not every hat is able to be Unusual, for now only hats that are equipped on the ``head`` region are able to gain an Unusual effect. I may change this to only filter cosmetics that do not have the capability of being Unusual.
-* If the Unusual effect is applied to a multi-class hat, the effect persists on class change.
-* If the cosmetic is **painted**, then the paint is kept with the unusual effect applied. Should also work with **halloween spells**.
-* There is a chance for this plugin to cause a memory leak, I've fixed it on a previous release, but in case this happens again please report it to the **Issues** page on this Git Repo.
+## tf2item_weapons
+* Players can customize their legit weapons at will, applying Unusual effects, setting Australiums and/or Festivizers, custom War Paints with custom Wears, spells and entire Killstreak combinations.
+* All War Paints in the game are listed ([if there's a translation phrase registered for that specific one](https://github.com/punteroo/TF2-Item-Plugins#Updating_tf2item_cosmetics)), but that doesn't mean they can all be applied to a certain weapon.
+* War Paints can either: keep the Wear of the original weapon (if it has it) or set a custom one.
+* Overrides set by this plugin will always keep in mind original attributes, for ex.: _if you have a legit **Australium Scattergun** with **Specialized Killstreak** and **Team Shine** sheen, they will not dissapear when setting (for example) an Unusual effect on it, only when overriden by the same attrbute (such as changing the applied Sheen on it)_
 
 Command | Description | Example
 ----------- | ------------- | ----------
-sm_unu | Opens up the Unusual cosmetics configuration menu. Can be applied to multiple hats and each one with a different effect. If it doesn't show up on the list it isn't compatible. | [YouTube Video Demonstration](https://youtu.be/b8KsEIfNUyQ?t=133)
-sm_unusual | Same as the command above, just longer. | N/A
-sm_inusual | Same as the command above, just longer. | N/A
-
-## vip-paints
-* Lets players choose a custom paint color for their cosmetics. Only allows cosmetics with the ``paintable`` capability to be chosen.
-* This plugin **does not** work in conjuction with [vip-unusuals](https://github.com/punteroo/TF2-Item-Plugins/blob/production/scripting/vip-unusuals.sp) as it deletes the Unusual effect applied on the hat to replace it with paint. I might merge these 2 plugins in order to achieve full functionality, probably in a future release.
-* The paint will remove the Unusual effect present, regardless if it's from the plugin or a legit one. I'll probably fix this on a future release.
-* This plugin **supports team paints**. They're applied respectively according to your team.
-
-Command | Description | Example
------------ | ------------- | ----------
-sm_paint | Opens up the cosmetic painting configuration menu. **Painting will remove Unusual effects if applied.** | [YouTube Video Demonstration](https://www.youtube.com/watch?v=vkGS_XP9HLw)
+sm_weapons | Opens up the Weapons Manager. | [YouTube Video Demonstration](https://www.youtube.com/watch?v=jCfrcZXz_FQ)
+sm_weps | Same as the command above, just different | N/A
+sm_myweps | Same as the command above, just different | N/A
 
 ## vip-unusual-glow
 * Allows players to apply one of the new 'player glow' Unusual taunt effects on them permanently.
@@ -112,25 +126,17 @@ sm_glowme | Same as the command above, just different | N/A
 ```cpp
 "VIP-System"
 {
-	"Unusual Menu"					// What the player reads in the menu as an option.
+	"Cosmetics Manager" // What the player reads in the menu as an option.
 	{
-		"command"		"sm_unu"		// The command that is executed for the player.
+		"command"		"sm_hats" // The command that is executed for the player.
 	}
-	"Killstreak Menu"
+	"Weapons Manager"
 	{
-		"command"		"sm_killstreak"
+		"command"		"sm_weps"
 	}
-	"Australium & Special Weapons Menu"
-	{
-		"command"		"sm_aussie"
-	}
-	"Unusual Glow Menu"
+	"Unusual Glow"
 	{
 		"command"		"sm_unuglow"
-	}
-	"Hat Paints Menu"
-	{
-		"command"		"sm_paint"
 	}
 }
 ```
