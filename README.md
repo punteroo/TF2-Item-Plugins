@@ -67,6 +67,8 @@ You will require to run these **.py** scripts to update each of them.
 
 The script is primitive. I will write an easier to use script later (PRs are also welcome).
 
+Also Unused War Paints are parsed, so watch out!
+
 1. Head over to your **SourceMod** installation and into the ``translations`` folder.
 2. You should see a **Python Script** named [paintkits.py](https://github.com/punteroo/TF2-Item-Plugins/blob/production/translations/paintkits.py) (if not, click on the link and download it). Write down its absolute location (For ex.: ``C:/paintkits.py``)
 3. **NOTE:** The scripts' location is not important, it doesn't have to be in the translations folder.
