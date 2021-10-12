@@ -98,7 +98,7 @@ sm_myhats | Same as the command above, just different | N/A
 
 ## tf2item_weapons
 * Players can customize their legit weapons at will, applying Unusual effects, setting Australiums and/or Festivizers, custom War Paints with custom Wears, spells and entire Killstreak combinations.
-* All War Paints in the game are listed ([if there's a translation phrase registered for that specific one](https://github.com/punteroo/TF2-Item-Plugins#Updating_tf2item_cosmetics)), but that doesn't mean they can all be applied to a certain weapon.
+* All War Paints in the game are listed ([if there's a translation phrase registered for that specific one](https://github.com/punteroo/TF2-Item-Plugins#Updating-tf2item_cosmetics)), but that doesn't mean they can all be applied to a certain weapon.
 * War Paints can either: keep the Wear of the original weapon (if it has it) or set a custom one.
 * Overrides set by this plugin will always keep in mind original attributes, for ex.: _if you have a legit **Australium Scattergun** with **Specialized Killstreak** and **Team Shine** sheen, they will not dissapear when setting (for example) an Unusual effect on it, only when overriden by the same attrbute (such as changing the applied Sheen on it)_
 
