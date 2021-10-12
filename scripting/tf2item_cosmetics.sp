@@ -173,6 +173,9 @@ public int paintHdlr(Menu menu, MenuAction action, int client, int p2) {
 			
 			int paint = StringToInt(sel);
 			
+			if (pCosmetics[client].iItemIndex[slot] != iItemDefinitionIndex)
+				pCosmetics[client].ResetFor(slot);
+			
 			pCosmetics[client].iItemIndex[slot] = iItemDefinitionIndex;
 			pCosmetics[client].cPaint[slot]     = paint;
 			
@@ -199,6 +202,9 @@ public int EffectHdlr(Menu menu, MenuAction action, int client, int p2) {
 		case MenuAction_Select: {
 			char sel[32];
 			GetMenuItem(menu, p2, sel, sizeof(sel));
+			
+			if (pCosmetics[client].iItemIndex[slot] != iItemDefinitionIndex)
+				pCosmetics[client].ResetFor(slot);
 			
 			pCosmetics[client].iItemIndex[slot] = iItemDefinitionIndex;
 			pCosmetics[client].uEffects[slot]   = StringToInt(sel);
@@ -241,6 +247,10 @@ public int otherHdlr(Menu menu, MenuAction action, int client, int p2) {
 			// User selected Voices From Below toggle
 			// don't laugh at this detection method pls :(
 			if (p2 == 4) {
+				if (pCosmetics[client].iItemIndex[slot] != iItemDefinitionIndex)
+					pCosmetics[client].ResetFor(slot);
+				
+				pCosmetics[client].iItemIndex[slot] = iItemDefinitionIndex;
 				pCosmetics[client].sVoices[slot] = !pCosmetics[client].sVoices[slot];
 				
 				ForceChange(client, slot);
@@ -272,6 +282,9 @@ public int spellHdlr(Menu menu, MenuAction action, int client, int p2) {
 			char sel[64];
 			GetMenuItem(menu, p2, sel, sizeof(sel));
 			
+			if (pCosmetics[client].iItemIndex[slot] != iItemDefinitionIndex)
+				pCosmetics[client].ResetFor(slot);
+			
 			pCosmetics[client].iItemIndex[slot] = iItemDefinitionIndex;
 			pCosmetics[client].sPaint[slot]     = StringToInt(sel);
 			ForceChange(client, slot);
@@ -301,6 +314,9 @@ public int footHdlr(Menu menu, MenuAction action, int client, int p2) {
 		case MenuAction_Select: {
 			char sel[64];
 			GetMenuItem(menu, p2, sel, sizeof(sel));
+			
+			if (pCosmetics[client].iItemIndex[slot] != iItemDefinitionIndex)
+				pCosmetics[client].ResetFor(slot);
 			
 			pCosmetics[client].iItemIndex[slot] = iItemDefinitionIndex;
 			pCosmetics[client].sFoot[slot]      = StringToInt(sel);
