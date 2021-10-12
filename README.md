@@ -23,18 +23,18 @@ If you have any doubts or want something else, just write it down on the **Issue
 
 # TODO
 - [x] Translations, for Spanish and English users.
-- [X] Merge **vip-unusuals** with **vip-paints** to maintain functionality between them, as one removes the others' effects.
-- [ ] Implement preference saving on **vip-australium**, **vip-unusuals** and **vip-paints** so selected user effects are applied whenever the user re-joins the server. This would nullify the player from opening the menus again each map change to re-apply said preferences.
-- [X] Fix Unusual Effects (custom or legit) not being kept after applying a custom paint effect, could probably be permanently fixed when the merge is applied.
+- [X] Merge everything to maintain functionality, as one removes the others' effects.
+- [ ] Implement preference saving on **tf2item_cosmetics** and **tf2item_weapons** so selected user effects are applied whenever the user re-joins the server. This would nullify the player from opening the menus again each map change to re-apply said preferences.
+- [X] Fix Unusual Effects (custom or legit) not being kept after applying a custom paint effect, could probably be permanently fixed when the merge is applied (merge is done).
 - [x] ~~Refresh handles upon re-loading to prevent plugin failing on late-load (reload, refresh or unload and load)~~ Replace all ``Handle``s for ``enum struct``s.
-- [x] Fix a **probably problematic** memory leak in **vip-unusuals**.
+- [x] Fix a **probably problematic** memory leak when applying Unusual Effects.
 
 # Requirements
 
 In order for these plugins to work you need the following dependencies installed on your server:
 * [TF2Items](https://forums.alliedmods.net/showthread.php?t=115100)
 * [TF2Attributes](https://forums.alliedmods.net/showthread.php?t=210221)
-* [TF2EconData](https://forums.alliedmods.net/showthread.php?t=315011)
+* [TFEconData](https://forums.alliedmods.net/showthread.php?t=315011)
 
 For compilation you require my custom includes provided in the repository, the includes from the dependencies mentioned above and the following includes as well:
 * [MoreColors](https://forums.alliedmods.net/showthread.php?t=185016)
