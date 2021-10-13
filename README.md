@@ -88,6 +88,18 @@ Also Unused War Paints are parsed, so watch out!
 
 # Plugin Pack Usage
 
+## ConVars (new with v3.0.1)
+You can now customize the plugin pack's functionality utilizing **ConVars**.
+
+ConVar | Description | Plugin it Affects | Default Value
+------ | ----------- | ----------------- | -------------
+tf2items_general_onlyspawn | Restricts players to only be able to utilize any manager inside a spawn region. | **tf2item_cosmetics** & **tf2item_weapons** | 0
+tf2items_cosmetics_show_missing_particles | Logs whenever a valid ID for a War Paint or Unusual Effect is tried to be added onto a menu, but fails because of a missing translation phrase. Good to know for updating, but bad because of the spam amount. | **tf2item_cosmetics** & **tf2item_weapons** | 0
+tf2items_cosmetics_unusuals | Toggles the ability for players to utilize Unusual Overrides on their cosmetics. | **tf2item_cosmetics** | 1
+tf2items_cosmetics_paints | Toggles the ability for players to utilize Paint Overrides on their cosmetics. | **tf2item_cosmetics** | 1
+tf2items_cosmetics_spells | Toggles the ability for players to utilize Halloween Spell Overrides on their cosmetics. | **tf2item_cosmetics** | 1
+tf2items_cosmetics_append_ids | Appends the Unusual Effect ID to its name on the menu. Ex.: ``Burning Flames (#13)`` | **tf2item_cosmetics** | 0
+
 ## tf2item_cosmetics
 * Players can customize their legit cosmetic items at will, applying Unusual effects, paint colors, spells and spell paints.
 * Overrides set by this plugin will always keep in mind original attributes, for ex.: _if you have a legit **Unusual Pomade Prince** with **Halloween Spell: Voices From Below** and **Molten Mallard** effect, they will not disappear when setting a paint colour on it, only when overriden by the same attribute (such as changing the Unusual effect to **Burning Flames**)_
