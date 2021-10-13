@@ -37,8 +37,9 @@
 // Is the player currently in a spawn region?
 bool bPlayerInSpawn[MAXPLAYERS + 1] = false;
 
+// I am now officially a student of dark arts. Don't thank me, thank my master: Scag :)
 stock ConVar CV_OnlySpawn, CV_LogMissingTranslations,
-	   
+
 CV_Cosmetics_Unusuals, CV_Cosmetics_Paint, CV_Cosmetics_Spells, CV_Cosmetics_ShowIDs, CV_Cosmetics_UParticles;
 
 //    ConVars and more customization for user experiences.
