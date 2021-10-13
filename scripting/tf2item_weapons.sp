@@ -3,7 +3,7 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define PLUGIN_VERSION "3.0.0"
+#define PLUGIN_VERSION "3.0.1"
 
 public Plugin myinfo = 
 {
@@ -69,6 +69,11 @@ public void OnPluginStart() {
 	LoadTranslations("weapons.phrases.txt");
 	// Translations!
 	
+	// Hook onto player spawning / loadout reload (for special weapons to be given correctly)
+	HookEvent("player_spawn", OnPlayerSpawn);
+	HookEvent("post_inventory_application", OnPlayerSpawn);
+	
+	// Late loading reset
 	if (bLateLoad) {
 		for (int i = 1; i < MaxClients; i++) {
 			if (IsClientInGame(i) && !IsClientSourceTV(i) && !IsFakeClient(i))
@@ -93,8 +98,16 @@ public void OnPluginStart() {
 }*/
 
 public Action CMD_Weapons(int client, int args) {
-	mMainMenu(client);
+	if (CV_OnlySpawn.BoolValue && !bPlayerInSpawn[client])
+		CReplyToCommand(client, "%s This server does not allow you to utilize this command outside of spawn.", PGTAG);
+	else
+		mMainMenu(client);
 	return Plugin_Handled;
+}
+
+public void OnMapStart() {
+	if (CV_OnlySpawn.BoolValue)
+		HookRespawns();
 }
 
 //
@@ -106,7 +119,30 @@ public int mainHdlr(Menu menu, MenuAction action, int client, int p2) {
 			char sel[32];
 			GetMenuItem(menu, p2, sel, sizeof(sel));
 			
-			wMainMenu(client, StringToInt(sel), p2);
+			if (sel[0] == 's') {
+				// Special Weapon item was selected
+				// Create the ArrayList
+				ArrayList specials = new ArrayList();
+				specials.Push(-1);
+				specials.Push(1071);
+				specials.Push(423);
+				specials.Push(169);
+				
+				// Push one index
+				int index = specials.FindValue(pWeapons[client].Special) + 1;
+				// If (for some reason) the value wasn't found, just set it to the 0 index override.
+				if (index == -1) index = 0;
+				
+				// Set the special weapon iItemDefinitionIndex
+				pWeapons[client].Special = index >= specials.Length ? specials.Get(0) : specials.Get(index);
+				
+				// Clear memory
+				delete specials;
+				
+				// Re-open menu to keep selections
+				mMainMenu(client);
+			} else
+				wMainMenu(client, StringToInt(sel), p2);
 		}
 		case MenuAction_End: delete menu;
 	}
@@ -465,11 +501,25 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
 		// Override detected for this item ID?
 		if (overItemIndex == iItemDefinitionIndex) {
 			// Declare item flags
-			int flags = OVERRIDE_ALL | PRESERVE_ATTRIBUTES | FORCE_GENERATION;
+			int flags = OVERRIDE_ALL | PRESERVE_ATTRIBUTES;
 			
 			// For some reason, if it's an allclass melee it requires the FORCE_GENERATION flag
-			if (StrContains(classname, "saxxy", false) != -1)
+			if (StrContains(classname, "saxxy", false) != -1) {
 				flags |= FORCE_GENERATION;
+				
+				// Rewrite the weapon classname accordingly (to spawn the weapon properly)
+				switch (TF2_GetPlayerClass(client)) {
+					case TFClass_Scout:	   strcopy(classname, 64, "tf_weapon_bat");
+					case TFClass_Pyro:	   strcopy(classname, 64, "tf_weapon_fireaxe");
+					case TFClass_DemoMan:  strcopy(classname, 64, "tf_weapon_bottle");
+					case TFClass_Heavy:	   strcopy(classname, 64, "tf_weapon_fists");
+					case TFClass_Engineer: strcopy(classname, 64, "tf_weapon_wrench");
+					case TFClass_Medic:	   strcopy(classname, 64, "tf_weapon_bonesaw");
+					case TFClass_Sniper:   strcopy(classname, 64, "tf_weapon_club");
+					case TFClass_Spy:	   strcopy(classname, 64, "tf_weapon_knife");
+					default:			   strcopy(classname, 64, "tf_weapon_shovel");
+				}
+			}
 			
 			// Is this a class based weapon? This is only for Shotgun weapons.
 			//  Shotgun variants:
@@ -520,6 +570,46 @@ public void TF2Items_OnGiveNamedItem_Post(int client, char[] classname, int iIte
 		SetEntProp(entityIndex, Prop_Send, "m_bValidatedAttachedEntity", 1);
 }
 
+// Handle player spawns for Special Weapons
+public void OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast) {
+	// Get client that fired the event
+	int client = GetClientOfUserId(event.GetInt("userid"));
+	
+	// Do the necessary checks and if they pass, give the player their Special Weapon override.
+	GiveSpecialWeapon(client);
+}
+
+// Give a Special Weapon to a player, transferring their attributes to it as well.
+void GiveSpecialWeapon(int client) {
+	// Does this player have a special weapon selected?
+	if (pWeapons[client].Special > -1) {
+		// Detect if the melee weapon is being given
+		TFClassType class = TF2_GetPlayerClass(client);
+		
+		// Do not give the Golden Wrench if they're not an Engineer
+		if (pWeapons[client].Special == 169 && class != TFClass_Engineer) return;
+		
+		// Classname to send for the weapon spawn.
+		char classname[64];
+		
+		// Re-write classname for the saxxy weapon
+		switch (class) {
+			case TFClass_Scout:	   strcopy(classname, 64, "tf_weapon_bat");
+			case TFClass_Soldier:  strcopy(classname, 64, "tf_weapon_shovel");
+			case TFClass_Pyro:	   strcopy(classname, 64, "tf_weapon_fireaxe");
+			case TFClass_DemoMan:  strcopy(classname, 64, "tf_weapon_bottle");
+			case TFClass_Heavy:	   strcopy(classname, 64, "tf_weapon_fists");
+			case TFClass_Engineer: strcopy(classname, 64, "tf_weapon_wrench");
+			case TFClass_Medic:	   strcopy(classname, 64, "tf_weapon_bonesaw");
+			case TFClass_Sniper:   strcopy(classname, 64, "tf_weapon_club");
+			case TFClass_Spy:	   strcopy(classname, 64, "tf_weapon_knife");
+		}
+		
+		// Time it to give the new weapon, we're done!
+		GiveStrangeWeapon(client, pWeapons[client].Special, classname, 2, OVERRIDE_ALL | PRESERVE_ATTRIBUTES | FORCE_GENERATION, true);
+	}
+}
+
 // Handle the Strange Variant to give.
 public Action HandleStrange(Handle timer, DataPack pack) {
 	// Null the timer (prevent Handle leaks)
@@ -536,6 +626,9 @@ public Action HandleStrange(Handle timer, DataPack pack) {
 	
 	int slot = pack.ReadCell(), flags = pack.ReadCell();
 	
+	// Delete the DataPack, we do not need it anymore
+	delete pack;
+	
 	// Set-up the new weapon (strange variant of the stock)
 	GiveStrangeWeapon(client, iItemDefinitionIndex, classname, slot, flags);
 	
@@ -544,7 +637,7 @@ public Action HandleStrange(Handle timer, DataPack pack) {
 }
 
 // Applies all attributes from overrides on the hItem handle and returns the proper response accordingly.
-Action ApplyChanges(Handle& hItem, int client, int iItemDefinitionIndex, char[] classname, int slot, int flags, bool isNew = false) {
+Action ApplyChanges(Handle& hItem, int client, int iItemDefinitionIndex, char[] classname, int slot, int flags, bool isNew = false, bool isSpecial = false) {
 	hItem = TF2Items_CreateItem(flags);
 			
 	// Set the same ID (if it was stock it will now be the strange variant)
@@ -599,7 +692,7 @@ Action ApplyChanges(Handle& hItem, int client, int iItemDefinitionIndex, char[] 
 	// 1007 - SPELL: Halloween pumpkin explosions (Squash Rockets, Sentry Quad-Pumpkings & Gourd Grenades)
 	//
 	// Total Possible Attributes: 13 (holy shit)
-	TF2Items_SetNumAttributes(hItem, 13);
+	TF2Items_SetNumAttributes(hItem, isSpecial ? 14 : 13);
 	
 	// Has Unusual override?
 	int unusual = hasUnusual ? pWeapons[client].uEffects[slot] : orgWeapons[client][slot].uEffects;
@@ -614,7 +707,7 @@ Action ApplyChanges(Handle& hItem, int client, int iItemDefinitionIndex, char[] 
 	
 	TF2Items_SetAttribute(hItem, 1, 2027, hasAussie ? float(hasAussie) : float(orgAussie));
 	TF2Items_SetAttribute(hItem, 2, 2022, hasAussie ? float(hasAussie) : float(orgAussie));
-	TF2Items_SetAttribute(hItem, 3, 542,  hasAussie ? float(hasAussie) : float(orgAussie));
+	TF2Items_SetAttribute(hItem, 3, 542,  isSpecial ? 0.0 : (hasAussie ? float(hasAussie) : float(orgAussie)));
 	
 	// Has Festive Override?
 	bool hasFestive = pWeapons[client].Festive[slot], orgFestive = orgWeapons[client][slot].Festive;
@@ -648,6 +741,9 @@ Action ApplyChanges(Handle& hItem, int client, int iItemDefinitionIndex, char[] 
 	TF2Items_SetAttribute(hItem, 11, 1008, hasFlames     ? float(hasFlames)    : float(view_as<bool>(oSpells & WeaponSpell_SpectralFlames)));
 	TF2Items_SetAttribute(hItem, 12, 1007, hasExplosion  ? float(hasExplosion) : float(view_as<bool>(oSpells & WeaponSpell_Explosions)));
 	
+	if (isSpecial)
+		TF2Items_SetAttribute(hItem, 13, 150, 1.0);
+	
 	TF2Items_SetFlags(hItem, flags);
 	
 	// If this is a new weapon (stock -> strange) fire another method.
@@ -658,12 +754,12 @@ Action ApplyChanges(Handle& hItem, int client, int iItemDefinitionIndex, char[] 
 }
 
 // GiveStrangeWeapon - Issues a new TF2ItemType Handle and gives the player a completely new Strange variant weapon for TF2Items_OnGiveNamedItem to apply changes on.
-void GiveStrangeWeapon(int client, int iItemDefinitionIndex, char[] classname, int slot, int flags) {
+void GiveStrangeWeapon(int client, int iItemDefinitionIndex, char[] classname, int slot, int flags, bool isSpecial = false) {
 	// Create new Item Handle for the Strange Variant
 	Handle hItem = INVALID_HANDLE;
 	
 	// Apply all attribute changes on it
-	ApplyChanges(hItem, client, iItemDefinitionIndex, classname, slot, flags, true);
+	ApplyChanges(hItem, client, iItemDefinitionIndex, classname, slot, flags, true, isSpecial);
 	
 	// Delete the handle, no memory leaks!
 	delete hItem;
@@ -772,6 +868,11 @@ void GetOriginalAttributes(int client, int slot) {
 
 // ForceChange() - Forces an SDKCall on the player to get effects applied instantly.
 void ForceChange(int client, int slot) {
+	if (CV_OnlySpawn.BoolValue && !bPlayerInSpawn[client]) {
+		CPrintToChat(client, "%s You are not allowed to make changes outside of spawn!", PGTAG);
+		return;
+	}
+	
 	// Get all SOC attribs he had so we check for No Override settings
 	GetOriginalAttributes(client, slot);
 	
@@ -841,11 +942,63 @@ public Action ForceTimer(Handle timer, DataPack data)
 		}
 	}
 	
+	// Give Special Weapon to the player (if they have one)
+	GiveSpecialWeapon(client);
+	
 	// Set active weapon as the changed one
 	SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", GetPlayerWeaponSlot(client, slot));
 	
 	// Clean timer
 	return Plugin_Stop;
+}
+
+// mMainMenu - Main menu for all users. Allows them to select one of their weapons to begin modifying them.
+void mMainMenu(int client) {
+	Menu menu = new Menu(mainHdlr);
+	
+	menu.SetTitle("Welcome! Select a Weapon");
+	
+	for (int i = 0; i < MAX_WEAPONS; i++) {
+		int weapon = GetPlayerWeaponSlot(client, i);
+		
+		if (weapon != INVALID_WEAPON_ENTITY) {
+			char name[64], idStr[12];
+			
+			int iItemDefinitionIndex = GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex");
+			
+			// will turn the stock weapon ID to a strange variant (if it fails it doesn't matter, value remains unchanged)
+			StockToStrange(iItemDefinitionIndex);
+			
+			// If the user has a special weapon override, utilize the original weapon ID that was on the melee slot. If no overrides where set, then whatever I guess.
+			if (pWeapons[client].Special == iItemDefinitionIndex)
+				iItemDefinitionIndex = pWeapons[client].iItemIndex[i] != -1 ? pWeapons[client].iItemIndex[i] : iItemDefinitionIndex;
+			
+			Format(idStr, sizeof(idStr), "%d", iItemDefinitionIndex);
+			TF2Econ_GetItemName(iItemDefinitionIndex, name, sizeof(name));
+			
+			menu.AddItem(idStr, name);
+		} else // To maintain slot consistency, an invisible item is added.
+			menu.AddItem("", "", ITEMDRAW_IGNORE);
+	}
+	
+	// Special Weapon Preferences
+	char name[64], display[64];
+	if (pWeapons[client].Special < 1)
+		strcopy(name, sizeof(name), "No Override");
+	else
+		TF2Econ_GetItemName(pWeapons[client].Special, name, sizeof(name));
+	
+	Format(display, sizeof(display), "Special Weapon: %s", name);
+	
+	menu.AddItem("-", "Special Weapons override your melee to the one specified here, you require a respawn to obtain them.", ITEMDRAW_DISABLED);
+	menu.AddItem("-", "Overrides you set on your melee slot will be sent over to the special weapon.", ITEMDRAW_DISABLED);
+	
+	menu.AddItem("s", display);
+	
+	menu.AddItem("-", "Usage: Select your desired weapon and start fiddling!", ITEMDRAW_DISABLED);
+	
+	menu.ExitButton = true;
+	menu.Display(client, MENU_TIME_FOREVER);
 }
 
 // wMainMenu - Main menu for selected weapons; shows a resume of what can be modified on it and what can't (according to compatibility).
