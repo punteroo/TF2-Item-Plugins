@@ -3,7 +3,7 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define PLUGIN_VERSION "3.0.0"
+#define PLUGIN_VERSION "3.0.1"
 
 public Plugin myinfo = 
 {
@@ -93,7 +93,10 @@ public void OnPluginStart() {
 }*/
 
 public Action CMD_Weapons(int client, int args) {
-	mMainMenu(client);
+	if (CV_OnlySpawn.BoolValue && !bPlayerInSpawn[client])
+		CReplyToCommand(client, "%s This server does not allow you to utilize this command outside of spawn.");
+	else
+		mMainMenu(client);
 	return Plugin_Handled;
 }
 
@@ -519,6 +522,8 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
 				
 				// Return Plugin_Handled to stop the original stock item from being given in the first place.
 				return Plugin_Handled;
+			} else if (pWeapons[client].Special[i] > -1) {
+				// TODO: implement special weapons
 			} else // Else just apply normal changes if this is not a stock ID.
 				return ApplyChanges(hItem, client, iItemDefinitionIndex, classname, i, flags, false);
 		}
@@ -786,6 +791,11 @@ void GetOriginalAttributes(int client, int slot) {
 
 // ForceChange() - Forces an SDKCall on the player to get effects applied instantly.
 void ForceChange(int client, int slot) {
+	if (CV_OnlySpawn.BoolValue && !bPlayerInSpawn[client]) {
+		CPrintToChat(client, "%s You are not allowed to make changes outside of spawn!", PGTAG);
+		return;
+	}
+	
 	// Get all SOC attribs he had so we check for No Override settings
 	GetOriginalAttributes(client, slot);
 	

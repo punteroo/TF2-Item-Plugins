@@ -3,7 +3,7 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define PLUGIN_VERSION "3.0.0"
+#define PLUGIN_VERSION "3.0.1"
 
 public Plugin myinfo = 
 {
@@ -70,6 +70,12 @@ public void OnPluginStart()
 	// Translations!
 }
 
+// Hook spawns if the ConVar is on
+public void OnMapStart() {
+	if (CV_OnlySpawn.BoolValue)
+		HookRespawns();
+}
+
 public void OnClientPostAdminCheck(int client) {
 	for (int i = 0; i < 3; i++)
 		pCosmetics[client].ResetFor(i);
@@ -88,7 +94,10 @@ public Action CMD_My(int client, int args) {
 
 public Action CMD_Cosmetics(int client, int args)
 {
-	GenerateHatsMenu(client);
+	if (CV_OnlySpawn.BoolValue && !bPlayerInSpawn[client])
+		CReplyToCommand(client, "%s This server does not allow you to utilize this command outside of spawn.");
+	else
+		GenerateHatsMenu(client);
 	return Plugin_Handled;
 }
 
@@ -552,6 +561,11 @@ void OthersMenu(int client, const char[] name, int iItemDefinitionIndex, int slo
 
 // ForceChange() - Forces an SDKCall on the player to get the Unusual effects to be applied instantly.
 void ForceChange(int client, int slot) {
+	if (CV_OnlySpawn.BoolValue && !bPlayerInSpawn[client]) {
+		CPrintToChat(client, "%s You are not allowed to make changes outside of spawn!", PGTAG);
+		return;
+	}
+	
 	int ent = -1;
 	while ((ent = FindEntityByClassname(ent, "tf_wearable")) != INVALID_ENT_REFERENCE) {		
 		if (client == GetEntPropEnt(ent, Prop_Send, "m_hOwnerEntity")) {
