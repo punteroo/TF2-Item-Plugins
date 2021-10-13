@@ -109,7 +109,30 @@ public int mainHdlr(Menu menu, MenuAction action, int client, int p2) {
 			char sel[32];
 			GetMenuItem(menu, p2, sel, sizeof(sel));
 			
-			wMainMenu(client, StringToInt(sel), p2);
+			if (sel[0] == 's') {
+				// Special Weapon item was selected
+				// Create the ArrayList
+				ArrayList specials = new ArrayList();
+				specials.Push(-1);
+				specials.Push(1071);
+				specials.Push(423);
+				specials.Push(169);
+				
+				// Push one index
+				int index = specials.FindValue(pWeapons[client].Special) + 1;
+				// If (for some reason) the value wasn't found, just set it to the 0 index override.
+				if (index == -1) index = 0;
+				
+				// Set the special weapon iItemDefinitionIndex
+				pWeapons[client].Special = index >= specials.Length ? specials.Get(0) : specials.Get(index);
+				
+				// Clear memory
+				delete specials;
+				
+				// Re-open menu to keep selections
+				mMainMenu(client);
+			} else
+				wMainMenu(client, StringToInt(sel), p2);
 		}
 		case MenuAction_End: delete menu;
 	}
@@ -461,6 +484,38 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
 	// Turn the item ID into the strange variant just to be sure.
 	bool changed = StockToStrange(iItemDefinitionIndex);
 	
+	// Detect if the melee weapon is being given
+	TFClassType class = TF2_GetPlayerClass(client);
+	if (TF2Econ_GetItemLoadoutSlot(iItemDefinitionIndex, class) == 2) {
+		if (pWeapons[client].Special > -1) {
+			// Do not give the Golden Wrench if they're not an Engineer
+			if (pWeapons[client].Special == 169 && class != TFClass_Engineer) return Plugin_Continue;
+			
+			// Re-write classname for the saxxy weapon
+			switch (class) {
+				case TFClass_Scout:	   strcopy(classname, 64, "tf_weapon_bat");
+				case TFClass_Soldier:  strcopy(classname, 64, "tf_weapon_shovel");
+				case TFClass_Pyro:	   strcopy(classname, 64, "tf_weapon_fireaxe");
+				case TFClass_DemoMan:  strcopy(classname, 64, "tf_weapon_bottle");
+				case TFClass_Heavy:	   strcopy(classname, 64, "tf_weapon_fists");
+				case TFClass_Engineer: strcopy(classname, 64, "tf_weapon_wrench");
+				case TFClass_Medic:	   strcopy(classname, 64, "tf_weapon_bonesaw");
+				case TFClass_Sniper:   strcopy(classname, 64, "tf_weapon_club");
+				case TFClass_Spy:	   strcopy(classname, 64, "tf_weapon_knife");
+			}
+			
+			// Write DataPack
+			DataPack pack = new DataPack();
+			pack.WriteCell(client);
+			pack.WriteCell(pWeapons[client].Special);
+			pack.WriteString(classname);
+			
+			// Time it to give the new weapon
+			CreateTimer(0.01, HandleSpecialWeapon, pack);
+			return Plugin_Handled;
+		}
+	}
+	
 	// Time to check for weapons.
 	for (int i = 0; i < 3; i++) {
 		int overItemIndex = pWeapons[client].iItemIndex[i];
@@ -468,7 +523,7 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
 		// Override detected for this item ID?
 		if (overItemIndex == iItemDefinitionIndex) {
 			// Declare item flags
-			int flags = OVERRIDE_ALL | PRESERVE_ATTRIBUTES | FORCE_GENERATION;
+			int flags = OVERRIDE_ALL | PRESERVE_ATTRIBUTES;
 			
 			// For some reason, if it's an allclass melee it requires the FORCE_GENERATION flag
 			if (StrContains(classname, "saxxy", false) != -1) {
@@ -522,8 +577,6 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
 				
 				// Return Plugin_Handled to stop the original stock item from being given in the first place.
 				return Plugin_Handled;
-			} else if (pWeapons[client].Special[i] > -1) {
-				// TODO: implement special weapons
 			} else // Else just apply normal changes if this is not a stock ID.
 				return ApplyChanges(hItem, client, iItemDefinitionIndex, classname, i, flags, false);
 		}
@@ -537,6 +590,30 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
 public void TF2Items_OnGiveNamedItem_Post(int client, char[] classname, int iItemDefinitionIndex, int itemLevel, int itemQuality, int entityIndex) {
 	if (HasEntProp(entityIndex, Prop_Send, "m_bValidatedAttachedEntity"))
 		SetEntProp(entityIndex, Prop_Send, "m_bValidatedAttachedEntity", 1);
+}
+
+// Handle the Special Weapon to give
+public Action HandleSpecialWeapon(Handle timer, DataPack pack) {
+	// Null the timer (prevent Handle leaks)
+	timer = null;
+	
+	// Reset DataPack to position 0
+	pack.Reset();
+	
+	// Read in order: client, special weapon, classname
+	int client = pack.ReadCell(), special = pack.ReadCell();
+	
+	char classname[64];
+	pack.ReadString(classname, sizeof(classname));
+	
+	// Delete the pack, we do not need it anymore.
+	delete pack;
+	
+	// Set-up the new weapon (Special Weapon w/ overrides if specified)
+	GiveStrangeWeapon(client, special, classname, 2, OVERRIDE_ALL | PRESERVE_ATTRIBUTES | FORCE_GENERATION);
+	
+	// Clean the timer
+	return Plugin_Stop;
 }
 
 // Handle the Strange Variant to give.
@@ -554,6 +631,9 @@ public Action HandleStrange(Handle timer, DataPack pack) {
 	pack.ReadString(classname, sizeof(classname));
 	
 	int slot = pack.ReadCell(), flags = pack.ReadCell();
+	
+	// Delete the DataPack, we do not need it anymore
+	delete pack;
 	
 	// Set-up the new weapon (strange variant of the stock)
 	GiveStrangeWeapon(client, iItemDefinitionIndex, classname, slot, flags);
@@ -897,9 +977,11 @@ void mMainMenu(int client) {
 	}
 	
 	// Special Weapon Preferences
-	//const int    specials[]       = {-1, 1071, 423, 169};
 	char name[64], display[64];
-	(pWeapons[client].Special < 1) ? strcopy(name, sizeof(name), "No Override") : TF2Econ_GetItemName(pWeapons[client].Special, name, sizeof(name));
+	if (pWeapons[client].Special < 1)
+		strcopy(name, sizeof(name), "No Override");
+	else
+		TF2Econ_GetItemName(pWeapons[client].Special, name, sizeof(name));
 	
 	Format(display, sizeof(display), "Special Weapon: %s", name);
 	
