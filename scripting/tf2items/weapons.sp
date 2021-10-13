@@ -121,6 +121,10 @@ enum struct WeaponsInfo {
 	// Spells [Bitfield]
 	int sSpells[3];
 	
+	// Special Weapon Selection
+	// Players can set a preference for Special Weapons (functionality previously seen in vip-australium)
+	int Special;
+	
 	/*
 	 * void ResetAll()
 	 *	Called to reset everything on the weapon. All is set to -1.
@@ -146,42 +150,14 @@ enum struct WeaponsInfo {
 		this.kStreaker[slot]  = -1;
 		
 		this.sSpells[slot]    = 0;
+		
+		this.Special          = -1;
 	}
 }
 
 //
 // Menu Creators
 ////////////////
-
-// mMainMenu - Main menu for all users. Allows them to select one of their weapons to begin modifying them.
-void mMainMenu(int client) {
-	Menu menu = new Menu(mainHdlr);
-	
-	menu.SetTitle("Welcome! Select a Weapon");
-	
-	for (int i = 0; i < MAX_WEAPONS; i++) {
-		int weapon = GetPlayerWeaponSlot(client, i);
-		
-		if (weapon != INVALID_WEAPON_ENTITY) {
-			char name[64], idStr[12];
-			
-			int iItemDefinitionIndex = GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex");
-			
-			// will turn the stock weapon ID to a strange variant (if it fails it doesn't matter, value remains unchanged)
-			StockToStrange(iItemDefinitionIndex);
-			
-			Format(idStr, sizeof(idStr), "%d", iItemDefinitionIndex);
-			TF2Econ_GetItemName(iItemDefinitionIndex, name, sizeof(name));
-			
-			menu.AddItem(idStr, name);
-		}
-	}
-	
-	menu.AddItem("-", "Usage: Select your desired weapon and start fiddling!", ITEMDRAW_DISABLED);
-	
-	menu.ExitButton = true;
-	menu.Display(client, MENU_TIME_FOREVER);
-}
 
 // wWarPaintProtodef - Allows the user to select a specific War Paint Protodef ID to set on their weapon.
 void wWarPaintProtodef(int client, int iItemDefinitionIndex, int slot) {

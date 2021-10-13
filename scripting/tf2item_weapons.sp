@@ -872,6 +872,47 @@ public Action ForceTimer(Handle timer, DataPack data)
 	return Plugin_Stop;
 }
 
+// mMainMenu - Main menu for all users. Allows them to select one of their weapons to begin modifying them.
+void mMainMenu(int client) {
+	Menu menu = new Menu(mainHdlr);
+	
+	menu.SetTitle("Welcome! Select a Weapon");
+	
+	for (int i = 0; i < MAX_WEAPONS; i++) {
+		int weapon = GetPlayerWeaponSlot(client, i);
+		
+		if (weapon != INVALID_WEAPON_ENTITY) {
+			char name[64], idStr[12];
+			
+			int iItemDefinitionIndex = GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex");
+			
+			// will turn the stock weapon ID to a strange variant (if it fails it doesn't matter, value remains unchanged)
+			StockToStrange(iItemDefinitionIndex);
+			
+			Format(idStr, sizeof(idStr), "%d", iItemDefinitionIndex);
+			TF2Econ_GetItemName(iItemDefinitionIndex, name, sizeof(name));
+			
+			menu.AddItem(idStr, name);
+		}
+	}
+	
+	// Special Weapon Preferences
+	//const int    specials[]       = {-1, 1071, 423, 169};
+	char name[64], display[64];
+	(pWeapons[client].Special < 1) ? strcopy(name, sizeof(name), "No Override") : TF2Econ_GetItemName(pWeapons[client].Special, name, sizeof(name));
+	
+	Format(display, sizeof(display), "Special Weapon: %s", name);
+	
+	menu.AddItem("-", "- Special Weapons override your melee to the one specified here.", ITEMDRAW_DISABLED);
+	
+	menu.AddItem("s", display);
+	
+	menu.AddItem("-", "Usage: Select your desired weapon and start fiddling!", ITEMDRAW_DISABLED);
+	
+	menu.ExitButton = true;
+	menu.Display(client, MENU_TIME_FOREVER);
+}
+
 // wMainMenu - Main menu for selected weapons; shows a resume of what can be modified on it and what can't (according to compatibility).
 void wMainMenu(int client, int iItemDefinitionIndex, int slot) {
 	Menu menu = new Menu(wepHdlr);
