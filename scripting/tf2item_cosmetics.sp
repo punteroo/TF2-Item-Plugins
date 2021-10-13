@@ -95,7 +95,7 @@ public Action CMD_My(int client, int args) {
 public Action CMD_Cosmetics(int client, int args)
 {
 	if (CV_OnlySpawn.BoolValue && !bPlayerInSpawn[client])
-		CReplyToCommand(client, "%s This server does not allow you to utilize this command outside of spawn.");
+		CReplyToCommand(client, "%s This server does not allow you to utilize this command outside of spawn.", PGTAG);
 	else
 		GenerateHatsMenu(client);
 	return Plugin_Handled;
@@ -456,7 +456,7 @@ void IntermediaryMenu(int client, int iItemDefinitionIndex, int slot) {
 	intMenu.AddItem(slotStr, "", ITEMDRAW_IGNORE);
 	
 	int anyMatch = 0;
-	if (IsHatUnusual(iItemDefinitionIndex)) {
+	if (IsHatUnusual(iItemDefinitionIndex && CV_Cosmetics_Unusuals.BoolValue)) {
 		int effect = pCosmetics[client].uEffects[slot];
 		
 		if (effect < 1 || pCosmetics[client].iItemIndex[slot] != iItemDefinitionIndex)
@@ -472,7 +472,7 @@ void IntermediaryMenu(int client, int iItemDefinitionIndex, int slot) {
 		intMenu.AddItem("unu", fName);
 		
 		anyMatch |= (1 << 0);
-	} if (IsHatPaintable(iItemDefinitionIndex)) {
+	} if (IsHatPaintable(iItemDefinitionIndex) && CV_Cosmetics_Paint.BoolValue) {
 		int paint = pCosmetics[client].cPaint[slot];
 		
 		char info[64];
@@ -490,7 +490,8 @@ void IntermediaryMenu(int client, int iItemDefinitionIndex, int slot) {
 		
 		static const char other[] = "Halloween Spells";
 		
-		intMenu.AddItem("other", other);
+		if (CV_Cosmetics_Spells.BoolValue)
+			intMenu.AddItem("other", other);
 		
 		anyMatch |= (1 << 1);
 	}

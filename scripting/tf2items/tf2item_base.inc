@@ -19,7 +19,7 @@
  * tf2item_weapons
  *  - Implemented a manual classname re-write for saxxy weapons (Issue #5).
  *    - TF2Items does not automatically set the proper classname for multi-class weapons.
- *  - Added functionality to utilize "Special Weapons"
+ *  - Adapted functionality to utilize "Special Weapons"
  *    - Players can give themselves special weapons such as: The Golden Frying Pan, The Saxxy and The Golden Wrench
  *
  * 3.0.0 - 12/10/21
@@ -37,29 +37,25 @@
 // Is the player currently in a spawn region?
 bool bPlayerInSpawn[MAXPLAYERS + 1] = false;
 
-ConVar CV_OnlySpawn,
+stock ConVar CV_OnlySpawn, CV_LogMissingTranslations,
 	   
-	   CV_Cosmetics_Unusuals,
-	   CV_Cosmetics_Paint,
-	   CV_Cosmetics_Spells,
-	   CV_Cosmetics_ShowIDs,
-	   CV_Cosmetics_UParticles;
+CV_Cosmetics_Unusuals, CV_Cosmetics_Paint, CV_Cosmetics_Spells, CV_Cosmetics_ShowIDs, CV_Cosmetics_UParticles;
 
 //    ConVars and more customization for user experiences.
 // 			TODO: Implement convar usage
 public void OnConfigsExecuted() {
 	// Global
-	CV_OnlySpawn = CreateConVar("tf2items_general_onlyspawn", "0", "Controls wether players can only modify their items inside spawn boundaries. Default is 1.", _, true, 0.0, true, 1.0);
-	 
+	CV_OnlySpawn              = CreateConVar("tf2items_general_onlyspawn", "0", "Controls wether players can only modify their items inside spawn boundaries. Default is 1.", _, true, 0.0, true, 1.0);
+	CV_LogMissingTranslations = CreateConVar("tf2items_cosmetics_show_missing_particles", "0", "Logs to the server whenever a parsed Unusual Particle/War Paint ID does not have an" ...
+																							 " existing translation for their name. I recommend leaving this off, as it causes" ...
+																							 " too much console spam and should only be used to debug. Default is 0.", _, true, 0.0, true, 1.0);
+	
 	// Cosmetics Manager
 	CV_Cosmetics_Unusuals   = CreateConVar("tf2items_cosmetics_unusuals", "1", "Are unusual overrides enabled? Default is 1.", _, true, 0.0, true, 1.0);
 	CV_Cosmetics_Paint      = CreateConVar("tf2items_cosmetics_paints", "1", "Are paint overrides enabled? Default is 1.", _, true, 0.0, true, 1.0);
 	CV_Cosmetics_Spells     = CreateConVar("tf2items_cosmetics_spells", "1", "Are halloween spells overrides enabled? Default is 1.", _, true, 0.0, true, 1.0);
 	CV_Cosmetics_ShowIDs    = CreateConVar("tf2items_cosmetics_append_ids", "0", "Should Item Definition Indexes and Unusual Effect Indexes be appended onto their names? " ...
 																				 "Example: 'Burning Flames (#13)'", _, true, 0.0, true, 1.0);
-	CV_Cosmetics_UParticles = CreateConVar("tf2items_cosmetics_show_missing_particles", "0", "Logs to the server whenever a parsed Unusual Particle ID does not have an" ...
-																							 " existing translation for their name. I recommend leaving this off, as it causes" ...
-																							 " too much console spam and should only be used to debug. Default is 0.", _, true, 0.0, true, 1.0);
 																							 	
 }
 

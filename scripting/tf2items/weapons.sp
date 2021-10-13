@@ -134,7 +134,7 @@ enum struct WeaponsInfo {
 			this.ResetFor(i);
 	}
 	
-	void ResetFor(int slot) {
+	void ResetFor(int slot, bool resetAll = false) {
 		this.iItemIndex[slot] = -1;
 		
 		this.uEffects[slot]   = -1;
@@ -151,7 +151,9 @@ enum struct WeaponsInfo {
 		
 		this.sSpells[slot]    = 0;
 		
-		this.Special          = -1;
+		// Do not reset the override if not needed.		
+		if (resetAll)
+			this.Special          = -1;
 	}
 }
 
@@ -187,7 +189,7 @@ void wWarPaintProtodef(int client, int iItemDefinitionIndex, int slot) {
 			Format(pName, sizeof(pName), "%T", pStr, client);
 			
 			menu.AddItem(pStr, pName);
-		} else
+		} else if (CV_LogMissingTranslations.BoolValue)
 			LogError("[TF2Weapons] Error while adding Paint Kit %s. Translation is missing. Paint Kit will not be added to the menu.", pStr);
 	}
 	
