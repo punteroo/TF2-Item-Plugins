@@ -468,8 +468,22 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
 			int flags = OVERRIDE_ALL | PRESERVE_ATTRIBUTES | FORCE_GENERATION;
 			
 			// For some reason, if it's an allclass melee it requires the FORCE_GENERATION flag
-			if (StrContains(classname, "saxxy", false) != -1)
+			if (StrContains(classname, "saxxy", false) != -1) {
 				flags |= FORCE_GENERATION;
+				
+				// Rewrite the weapon classname accordingly (to spawn the weapon properly)
+				switch (TF2_GetPlayerClass(client)) {
+					case TFClass_Scout:	   strcopy(classname, 64, "tf_weapon_bat");
+					case TFClass_Pyro:	   strcopy(classname, 64, "tf_weapon_fireaxe");
+					case TFClass_DemoMan:  strcopy(classname, 64, "tf_weapon_bottle");
+					case TFClass_Heavy:	   strcopy(classname, 64, "tf_weapon_fists");
+					case TFClass_Engineer: strcopy(classname, 64, "tf_weapon_wrench");
+					case TFClass_Medic:	   strcopy(classname, 64, "tf_weapon_bonesaw");
+					case TFClass_Sniper:   strcopy(classname, 64, "tf_weapon_club");
+					case TFClass_Spy:	   strcopy(classname, 64, "tf_weapon_knife");
+					default:			   strcopy(classname, 64, "tf_weapon_shovel");
+				}
+			}
 			
 			// Is this a class based weapon? This is only for Shotgun weapons.
 			//  Shotgun variants:
