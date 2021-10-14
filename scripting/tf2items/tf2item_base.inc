@@ -12,6 +12,12 @@
 /*
  * Change-Log
  *
+ * 3.0.2 - 14/10/21
+ * tf2item_weapons
+ *  - Fixed a wrongly initialized value for connecting players causing them to recieve a stock bat regardless of class.
+ * tf2item_cosmetics
+ *  - Fixed Unusual overrides not being added to the menu regardless of ConVar value (parenthesis mistake)
+ *
  * 3.0.1 - 13/10/21
  * 
  * General
