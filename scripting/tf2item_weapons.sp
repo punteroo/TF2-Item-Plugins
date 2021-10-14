@@ -3,7 +3,7 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define PLUGIN_VERSION "3.0.1"
+#define PLUGIN_VERSION "3.0.2"
 
 public Plugin myinfo = 
 {
@@ -108,6 +108,10 @@ public Action CMD_Weapons(int client, int args) {
 public void OnMapStart() {
 	if (CV_OnlySpawn.BoolValue)
 		HookRespawns();
+}
+
+public void OnClientPostAdminCheck(int client) {
+	pWeapons[client].ResetAll(true);
 }
 
 //
