@@ -110,6 +110,10 @@ public void OnMapStart() {
 		HookRespawns();
 }
 
+public void OnClientPostAdminCheck(int client) {
+	pWeapons[client].ResetAll(true);
+}
+
 //
 // Normal Menus Handlers
 ////////////////////////

@@ -129,9 +129,9 @@ enum struct WeaponsInfo {
 	 * void ResetAll()
 	 *	Called to reset everything on the weapon. All is set to -1.
 	 */
-	void ResetAll() {
+	void ResetAll(bool all = false) {
 		for (int i = 0; i < 3; i++)
-			this.ResetFor(i);
+			this.ResetFor(i, all);
 	}
 	
 	void ResetFor(int slot, bool resetAll = false) {
@@ -149,6 +149,7 @@ enum struct WeaponsInfo {
 		this.kSheen[slot]     = -1;
 		this.kStreaker[slot]  = -1;
 		
+		// Spells are set to 0 bc it's a bitfield
 		this.sSpells[slot]    = 0;
 		
 		// Do not reset the override if not needed.		
