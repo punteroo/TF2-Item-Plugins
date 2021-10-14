@@ -124,7 +124,7 @@ sm_myweps | Same as the command above, just different | N/A
 
 ## vip-unusual-glow
 * Allows players to apply one of the new 'player glow' Unusual taunt effects on them permanently.
-* This plugin has reports of lowering other players' FPS due to the Unusual effect being constantly applied to the player. There is nothing I can do about this issue other than tell you to get a better PC.
+* This plugin has reports of lowering other players' FPS due to the Unusual effect being constantly applied to the player. There is nothing I can do about this issue other than tell you to get a better PC or blame the game for not having great optimization in this matter.
 
 Command | Description | Example
 ----------- | ------------- | ----------
