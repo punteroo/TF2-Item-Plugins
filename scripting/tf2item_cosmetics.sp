@@ -456,7 +456,7 @@ void IntermediaryMenu(int client, int iItemDefinitionIndex, int slot) {
 	intMenu.AddItem(slotStr, "", ITEMDRAW_IGNORE);
 	
 	int anyMatch = 0;
-	if (IsHatUnusual(iItemDefinitionIndex && CV_Cosmetics_Unusuals.BoolValue)) {
+	if (IsHatUnusual(iItemDefinitionIndex) && CV_Cosmetics_Unusuals.BoolValue) {
 		int effect = pCosmetics[client].uEffects[slot];
 		
 		if (effect < 1 || pCosmetics[client].iItemIndex[slot] != iItemDefinitionIndex)
