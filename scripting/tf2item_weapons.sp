@@ -956,6 +956,138 @@ public Action ForceTimer(Handle timer, DataPack data)
 	return Plugin_Stop;
 }
 
+// PreferencesToString() - Gets all settings on the user and stringifies them into a readable string for later parsing.
+//
+// Format:
+// i,i,i-u,u,u-w,w,w-r,r,r-a,a,a-f,f,f-kt,kt,kt-ks,ks,ks-kr,kr,kr-s,s,s-p
+//
+// Where:
+//	i  = Item Indexes
+//	u  = Unusual Effects
+//	w  = War Paint
+//	r  = War Paint Wear
+//	a  = Australium Preference
+//	f  = Festivized Preference
+//	kt = Killstreak Type
+//	ks = Killstreak Sheen
+//	kr = Killstreaker
+//	s  = Spell Bitfields
+//	p  = Special Weapon
+void PreferencesToString(int client, char[] buffer, int size) {
+	// don't look
+	char prefs[520];
+	FormatEx(prefs, sizeof(prefs), "%d,%d,%d-%d,%d,%d-%d,%d,%d-%.1f,%.1f,%.1f-%d,%d,%d-%d,%d,%d-%d,%d,%d-%d,%d,%d-%d,%d,%d-%d,%d,%d-%d",
+			pWeapons[client].iItemIndex[0], pWeapons[client].iItemIndex[1], pWeapons[client].iItemIndex[2],
+			pWeapons[client].uEffects[0],   pWeapons[client].uEffects[1],   pWeapons[client].uEffects[2],
+			pWeapons[client].wPaint[0],     pWeapons[client].wPaint[1],     pWeapons[client].wPaint[2],
+			pWeapons[client].wWear[0],      pWeapons[client].wWear[1],      pWeapons[client].wWear[2],
+			pWeapons[client].Aussie[0],     pWeapons[client].Aussie[1],     pWeapons[client].Aussie[2],
+			pWeapons[client].Festive[0],    pWeapons[client].Festive[1],    pWeapons[client].Festive[2],
+			pWeapons[client].kType[0],      pWeapons[client].kType[1],      pWeapons[client].kType[2],
+			pWeapons[client].kSheen[0],     pWeapons[client].kSheen[1],     pWeapons[client].kSheen[2],
+			pWeapons[client].kStreaker[0],  pWeapons[client].kStreaker[1],  pWeapons[client].kStreaker[2],
+			pWeapons[client].sSpells[0],    pWeapons[client].sSpells[1],    pWeapons[client].sSpells[2],
+			pWeapons[client].Special);
+	
+	strcopy(buffer, size, prefs);
+}
+
+// ParsePreferenceString()
+//
+// Parses a Preferences string and loads it for the client. This should only be called ONCE per client connection.
+void ParsePreferenceString(int client, const char[] prefs) {
+	// please, don't kill me
+	char info[11][64];
+	ExplodeString(prefs, "-", info, sizeof(info), sizeof(info[]));
+	
+	// Since we're parsing, let's validate! We don't want any bad data being passed.
+	
+	// Item Indexes (Validation: Do they exist in schema?)
+	char id[3][12];
+	ExplodeString(info[0], ",", id, sizeof(id), sizeof(id[]));
+	
+	for (int i = 0; i < 3; i++) {
+		int tId = StringToInt(id[i]);
+		
+		if (TF2Econ_IsValidItemDefinition(tId))
+			pWeapons[client].iItemIndex[i] = tId;
+	}
+	
+	// Unusual Effects
+	char u[3][12];
+	ExplodeString(info[1], ",", u, sizeof(u), sizeof(u[]));
+	
+	for (int i = 0; i < 3; i++)
+		pWeapons[client].uEffects[i] = StringToInt(u[i]);
+	
+	// War Paints (Validation: Are they a listed translation? Can this weapon be War Painted?)
+	char w[3][12];
+	ExplodeString(info[2], ",", w, sizeof(w), sizeof(w[]));
+	
+	for (int i = 0; i < 3; i++) {
+		int tW = StringToInt(w[i]);
+		
+		if (TranslationPhraseExists(w[i]) && CanBePainted(StringToInt(id[i])))
+			pWeapons[client].wPaint[i] = tW;
+	}
+	
+	// War Paint Wear
+	char wear[3][12];
+	ExplodeString(info[3], ",", wear, sizeof(wear), sizeof(wear[]));
+	
+	for (int i = 0; i < 3; i++)
+		pWeapons[client].wWear[i] = StringToFloat(wear[i]);
+	
+	// Australium (Validation: Can this weapon be australium?)
+	char a[3][2];
+	ExplodeString(info[3], ",", a, sizeof(a), sizeof(a[]));
+	
+	for (int i = 0; i < 3; i++) {
+		if (CanBeAustralium(StringToInt(id[i])))
+			pWeapons[client].Aussie[i] = view_as<bool>(StringToInt(a[i]));
+	}
+	
+	// Festivized (Validation: Can this weapon be festivized?)
+	char f[3][2];
+	ExplodeString(info[4], ",", f, sizeof(f), sizeof(f[]));
+	
+	for (int i = 0; i < 3; i++) {
+		if (CanBeFestivized(StringToInt(id[i])))
+			pWeapons[client].Festive[i] = view_as<bool>(StringToInt(f[i]));
+	}
+	
+	// Killstreak Type
+	char kT[3][12];
+	ExplodeString(info[5], ",", kT, sizeof(kT), sizeof(kT[]));
+	
+	for (int i = 0; i < 3; i++)
+		pWeapons[client].kType[i] = StringToInt(kT[i]);
+	
+	// Killstreak Sheen
+	char kS[3][12];
+	ExplodeString(info[6], ",", kS, sizeof(kS), sizeof(kS[]));
+	
+	for (int i = 0; i < 3; i++)
+		pWeapons[client].kSheen[i] = StringToInt(kS[i]);
+	
+	// Killstreaker
+	char kR[3][12];
+	ExplodeString(info[7], ",", kR, sizeof(kR), sizeof(kR[]));
+	
+	for (int i = 0; i < 3; i++)
+		pWeapons[client].kStreaker[i] = StringToInt(kR[i]);
+	
+	// Spells
+	char s[3][12];
+	ExplodeString(info[8], ",", s, sizeof(s), sizeof(s[]));
+	
+	for (int i = 0; i < 3; i++)
+		pWeapons[client].sSpells[i] = StringToInt(s);
+	
+	// Special Weapon (it's alone, no commas)
+	pWeapons[client].Special = StringToInt(info[9]);
+}
+
 // mMainMenu - Main menu for all users. Allows them to select one of their weapons to begin modifying them.
 void mMainMenu(int client) {
 	Menu menu = new Menu(mainHdlr);
