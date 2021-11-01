@@ -43,7 +43,7 @@ For compilation you require my custom includes provided in the repository, the i
 
 As of **v3.0.0** TF2IDB is no longer required. Installation is literally a Drag & Drop of what's inside the **.zip** file.
 
-Read all the articles inside the [Requirements](https://github.com/punteroo/TF2-Item-Plugins#requirements) section and install them independently. the head over to the [Releases](https://github.com/punteroo/TF2-Item-Plugins/releases) section in this repository and download the latest one. **NOW** you can Drag & Drop the contents of the **.zip** into ``addons/sourcemod/``.
+Read all the articles inside the [Requirements](https://github.com/punteroo/TF2-Item-Plugins#requirements) section and install them independently, then head over to the [Releases](https://github.com/punteroo/TF2-Item-Plugins/releases) section in this repository and download the latest one. **NOW** you can Drag & Drop the contents of the **.zip** into ``addons/sourcemod/``.
 
 If any error was present during installation, contact me through **Discord** and I'll help you out whenever I'm able to.
 
