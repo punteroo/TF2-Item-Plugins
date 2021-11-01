@@ -27,6 +27,9 @@ WeaponsInfo pWeapons[MAXPLAYERS + 1];
 // Original Weapon Information for every player
 Weapon orgWeapons[MAXPLAYERS + 1][3];
 
+// Global Handle for the Preferences Cookie
+Handle pPreferences = INVALID_HANDLE;
+
 // Networkable Server Offsets (used for regen)
 int clipOff;
 int ammoOff;
@@ -54,7 +57,7 @@ public void OnPluginStart() {
 	RegAdminCmd("sm_weps", 	  CMD_Weapons, ADMFLAG_RESERVATION, "Opens the Weapons Manager menu.");
 	RegAdminCmd("sm_myweps",  CMD_Weapons, ADMFLAG_RESERVATION, "Opens the Weapons Manager menu.");
 	// Various ways of invoking the command. For user commodity ;)
-	//RegConsoleCmd("sm_my", CMD_Test);
+	// RegConsoleCmd("sm_my", CMD_Test);
 	
 	Handle hGameConf = LoadGameConfigFile("sm-tf2.games");
 	
@@ -73,16 +76,19 @@ public void OnPluginStart() {
 	HookEvent("player_spawn", OnPlayerSpawn);
 	HookEvent("post_inventory_application", OnPlayerSpawn);
 	
+	// Register Preference Saving Cookie
+	pPreferences = RegClientCookie("tf2item_weapons_prefs", "Weapon override preferences set for this user.", CookieAccess_Private);
+	
 	// Late loading reset
 	if (bLateLoad) {
 		for (int i = 1; i < MaxClients; i++) {
 			if (IsClientInGame(i) && !IsClientSourceTV(i) && !IsFakeClient(i))
-				pWeapons[i].ResetAll();
+				OnClientPostAdminCheck(i);
 		}
 	}
 }
 
-/*public Action CMD_Test(int client, int args) {
+/* public Action CMD_Test(int client, int args) {
 	PrintToConsole(client, "Your Overrides:");
 	PrintToConsole(client, "Item Indexes:   %d, %d, %d", pWeapons[client].iItemIndex[0], pWeapons[client].iItemIndex[1], pWeapons[client].iItemIndex[2]);
 	PrintToConsole(client, "Unusual Weps:   %d, %d, %d", pWeapons[client].uEffects[0], pWeapons[client].uEffects[1], pWeapons[client].uEffects[2]);
@@ -94,8 +100,9 @@ public void OnPluginStart() {
 	PrintToConsole(client, "Ks. Sheen:      %d, %d, %d", pWeapons[client].kSheen[0], pWeapons[client].kSheen[1], pWeapons[client].kSheen[2]);
 	PrintToConsole(client, "Ks. Streaker:   %d, %d, %d", pWeapons[client].kStreaker[0], pWeapons[client].kStreaker[1], pWeapons[client].kStreaker[2]);
 	PrintToConsole(client, "Spell Overr.:   %b, %b, %b", pWeapons[client].sSpells[0], pWeapons[client].sSpells[1], pWeapons[client].sSpells[2]);
+	PrintToConsole(client, "Special Weapon: %d",		 pWeapons[client].Special);
 	return Plugin_Handled;
-}*/
+} */
 
 public Action CMD_Weapons(int client, int args) {
 	if (CV_OnlySpawn.BoolValue && !bPlayerInSpawn[client])
@@ -112,6 +119,18 @@ public void OnMapStart() {
 
 public void OnClientPostAdminCheck(int client) {
 	pWeapons[client].ResetAll(true);
+	
+	// If user still has access to these commands, get their cookie and set their prefs.
+	// If permissions have been revoked, or no prefs are saved, just set them null.
+	if (CheckCommandAccess(client, "sm_weapons", ADMFLAG_RESERVATION)
+	 || CheckCommandAccess(client, "sm_weps", ADMFLAG_RESERVATION)
+	 || CheckCommandAccess(client, "sm_myweps", ADMFLAG_RESERVATION)) {
+	 	char cookie[520];
+	 	GetClientCookie(client, pPreferences, cookie, sizeof(cookie));
+	 	
+	 	if (strlen(cookie) > 0)
+	 		ParsePreferenceString(client, cookie);
+	}
 }
 
 //
@@ -877,6 +896,12 @@ void ForceChange(int client, int slot) {
 		return;
 	}
 	
+	// Save user preferences at this point.
+	char prefs[520];
+	PreferencesToString(client, prefs, sizeof(prefs));
+	
+	SetClientCookie(client, pPreferences, prefs);
+	
 	// Get all SOC attribs he had so we check for No Override settings
 	GetOriginalAttributes(client, slot);
 	
@@ -959,7 +984,7 @@ public Action ForceTimer(Handle timer, DataPack data)
 // PreferencesToString() - Gets all settings on the user and stringifies them into a readable string for later parsing.
 //
 // Format:
-// i,i,i-u,u,u-w,w,w-r,r,r-a,a,a-f,f,f-kt,kt,kt-ks,ks,ks-kr,kr,kr-s,s,s-p
+// i,i,i|u,u,u|w,w,w|r,r,r|a,a,a|f,f,f|kt,kt,kt|ks,ks,ks|kr,kr,kr|s,s,s|p
 //
 // Where:
 //	i  = Item Indexes
@@ -976,7 +1001,7 @@ public Action ForceTimer(Handle timer, DataPack data)
 void PreferencesToString(int client, char[] buffer, int size) {
 	// don't look
 	char prefs[520];
-	FormatEx(prefs, sizeof(prefs), "%d,%d,%d-%d,%d,%d-%d,%d,%d-%.1f,%.1f,%.1f-%d,%d,%d-%d,%d,%d-%d,%d,%d-%d,%d,%d-%d,%d,%d-%d,%d,%d-%d",
+	FormatEx(prefs, sizeof(prefs), "%d,%d,%d|%d,%d,%d|%d,%d,%d|%.1f,%.1f,%.1f|%d,%d,%d|%d,%d,%d|%d,%d,%d|%d,%d,%d|%d,%d,%d|%d,%d,%d|%d",
 			pWeapons[client].iItemIndex[0], pWeapons[client].iItemIndex[1], pWeapons[client].iItemIndex[2],
 			pWeapons[client].uEffects[0],   pWeapons[client].uEffects[1],   pWeapons[client].uEffects[2],
 			pWeapons[client].wPaint[0],     pWeapons[client].wPaint[1],     pWeapons[client].wPaint[2],
@@ -998,7 +1023,7 @@ void PreferencesToString(int client, char[] buffer, int size) {
 void ParsePreferenceString(int client, const char[] prefs) {
 	// please, don't kill me
 	char info[11][64];
-	ExplodeString(prefs, "-", info, sizeof(info), sizeof(info[]));
+	ExplodeString(prefs, "|", info, sizeof(info), sizeof(info[]));
 	
 	// Since we're parsing, let's validate! We don't want any bad data being passed.
 	
@@ -1039,17 +1064,18 @@ void ParsePreferenceString(int client, const char[] prefs) {
 		pWeapons[client].wWear[i] = StringToFloat(wear[i]);
 	
 	// Australium (Validation: Can this weapon be australium?)
-	char a[3][2];
-	ExplodeString(info[3], ",", a, sizeof(a), sizeof(a[]));
+	char a[3][4];
+	ExplodeString(info[4], ",", a, sizeof(a), sizeof(a[]));
 	
 	for (int i = 0; i < 3; i++) {
-		if (CanBeAustralium(StringToInt(id[i])))
+		int tId = StringToInt(id[i]);
+		if (CanBeAustralium(tId))
 			pWeapons[client].Aussie[i] = view_as<bool>(StringToInt(a[i]));
 	}
 	
 	// Festivized (Validation: Can this weapon be festivized?)
-	char f[3][2];
-	ExplodeString(info[4], ",", f, sizeof(f), sizeof(f[]));
+	char f[3][4];
+	ExplodeString(info[5], ",", f, sizeof(f), sizeof(f[]));
 	
 	for (int i = 0; i < 3; i++) {
 		if (CanBeFestivized(StringToInt(id[i])))
@@ -1058,34 +1084,35 @@ void ParsePreferenceString(int client, const char[] prefs) {
 	
 	// Killstreak Type
 	char kT[3][12];
-	ExplodeString(info[5], ",", kT, sizeof(kT), sizeof(kT[]));
+	ExplodeString(info[6], ",", kT, sizeof(kT), sizeof(kT[]));
 	
 	for (int i = 0; i < 3; i++)
 		pWeapons[client].kType[i] = StringToInt(kT[i]);
 	
 	// Killstreak Sheen
 	char kS[3][12];
-	ExplodeString(info[6], ",", kS, sizeof(kS), sizeof(kS[]));
+	ExplodeString(info[7], ",", kS, sizeof(kS), sizeof(kS[]));
 	
 	for (int i = 0; i < 3; i++)
 		pWeapons[client].kSheen[i] = StringToInt(kS[i]);
 	
 	// Killstreaker
 	char kR[3][12];
-	ExplodeString(info[7], ",", kR, sizeof(kR), sizeof(kR[]));
+	ExplodeString(info[8], ",", kR, sizeof(kR), sizeof(kR[]));
 	
 	for (int i = 0; i < 3; i++)
 		pWeapons[client].kStreaker[i] = StringToInt(kR[i]);
 	
 	// Spells
 	char s[3][12];
-	ExplodeString(info[8], ",", s, sizeof(s), sizeof(s[]));
+	ExplodeString(info[9], ",", s, sizeof(s), sizeof(s[]));
 	
 	for (int i = 0; i < 3; i++)
-		pWeapons[client].sSpells[i] = StringToInt(s);
+		pWeapons[client].sSpells[i] = StringToInt(s[i]);
 	
 	// Special Weapon (it's alone, no commas)
-	pWeapons[client].Special = StringToInt(info[9]);
+	int special = StringToInt(info[10]);
+	pWeapons[client].Special = special > 0 ? StringToInt(info[9]) : -1;
 }
 
 // mMainMenu - Main menu for all users. Allows them to select one of their weapons to begin modifying them.

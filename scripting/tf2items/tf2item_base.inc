@@ -2,6 +2,7 @@
 #include <lang>
 #include <tf2_stocks>
 #include <sdkhooks>
+#include <clientprefs>
 
 #include <morecolors>
 
