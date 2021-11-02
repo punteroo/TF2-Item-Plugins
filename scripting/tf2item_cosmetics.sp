@@ -34,6 +34,8 @@ Cosmetic orgCosmetics[MAXPLAYERS + 1][3];
 bool bPlayerIsSearching[MAXPLAYERS + 1] = false;
 // Global 2 cell array with item index and slot before the search
 int searchInfo[MAXPLAYERS + 1][2];
+// Global timer Handle for the query timer
+Handle gSearchTimer[MAXPLAYERS + 1] = INVALID_HANDLE;
 
 // Global Handle for the Preferences Cookie
 Handle pPreferences = INVALID_HANDLE;
@@ -83,7 +85,7 @@ public void OnPluginStart()
 	// Translations!
 	
 	// Occupy memory
-	unusualNames = new ArrayList();
+	unusualNames = new ArrayList(64);
 	unusualIds   = new ArrayList();
 	
 	// Handle late loading
@@ -109,7 +111,7 @@ public void OnMapStart() {
 }
 
 // Clean memory on map change
-public void OnMapEnd() { delete unusualNames; }
+public void OnMapEnd() { delete unusualNames; delete unusualIds; }
 
 public void OnClientPostAdminCheck(int client) {
 	bPlayerIsSearching[client] = false;
@@ -261,6 +263,9 @@ public int EffectHdlr(Menu menu, MenuAction action, int client, int p2) {
 			
 			// Handle search option
 			if (sel[0] == 's') {
+				// Clear timer if it is still running.
+				delete gSearchTimer[client];
+				
 				// Set boolean for searching to true, this is to intercept their next say command
 				bPlayerIsSearching[client] = true;
 				
@@ -272,7 +277,8 @@ public int EffectHdlr(Menu menu, MenuAction action, int client, int p2) {
 				CPrintToChat(client, "%s You have 15 seconds before the query expires.", PGTAG);
 				
 				// Create timer to forget about the function.
-				CreateTimer(15.0, ClearSearch, client);
+				if (gSearchTimer[client] == INVALID_HANDLE)
+					gSearchTimer[client] = CreateTimer(15.0, ClearSearch, client);
 				return 0;
 			}
 			
@@ -310,6 +316,15 @@ public Action OnClientSayCommand(int client, const char[] command, const char[] 
 	Menu results = new Menu(EffectHdlr);
 	results.SetTitle("Search results for %s", query);
 	
+	// Data embedding
+	char itemStr[32], slotStr[32];
+	IntToString(searchInfo[client][0], itemStr, sizeof(itemStr));
+	IntToString(searchInfo[client][1], slotStr, sizeof(slotStr));
+	
+	results.AddItem(slotStr, "", ITEMDRAW_IGNORE);
+	results.AddItem(itemStr, "", ITEMDRAW_IGNORE);
+	
+	// Time to query!
 	int found = 0;
 	for (int i = 0; i < unusualNames.Length; i++) {
 		char name[64], idStr[32];
@@ -334,11 +349,17 @@ public Action OnClientSayCommand(int client, const char[] command, const char[] 
 // Search timer expiry
 public Action ClearSearch(Handle timer, any client) {
 	// If the player boolean is false, no need to handle.
-	if (!bPlayerIsSearching[client]) return Plugin_Stop;
+	if (!bPlayerIsSearching[client]) {
+		delete gSearchTimer[client];
+		return Plugin_Stop;
+	}
 	
 	bPlayerIsSearching[client] = false;
 	
 	CPrintToChat(client, "%s Your search query time has expired.", PGTAG);
+	
+	delete gSearchTimer[client];
+	
 	return Plugin_Handled;
 }
 

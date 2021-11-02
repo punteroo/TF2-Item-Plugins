@@ -348,6 +348,10 @@ void AddUnusuals(Menu menu, int client)
 	// Unusual Particle Effects ID List
 	ArrayList unusuals = TF2Econ_GetParticleAttributeList(ParticleSet_CosmeticUnusualEffects);
 	
+	// Clear global ArrayLists
+	unusualNames.Clear();
+	unusualIds.Clear();
+	
 	for (int i; i < unusuals.Length; i++) {
 		int id = unusuals.Get(i);
 		
