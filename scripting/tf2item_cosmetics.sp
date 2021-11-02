@@ -30,6 +30,11 @@ CosmeticsInfo pCosmetics[MAXPLAYERS + 1];
 // Original Cosmetic Information for every player
 Cosmetic orgCosmetics[MAXPLAYERS + 1][3];
 
+// Global boolean to indicate a player is trying to do a search
+bool bPlayerIsSearching[MAXPLAYERS + 1] = false;
+// Global 2 cell array with item index and slot before the search
+int searchInfo[MAXPLAYERS + 1][2];
+
 // Global Handle for the Preferences Cookie
 Handle pPreferences = INVALID_HANDLE;
 
@@ -77,6 +82,10 @@ public void OnPluginStart()
 	LoadTranslations("unusuals.phrases.txt");
 	// Translations!
 	
+	// Occupy memory
+	unusualNames = new ArrayList();
+	unusualIds   = new ArrayList();
+	
 	// Handle late loading
 	if (bLateLoad) {
 		OnConfigsExecuted();
@@ -99,7 +108,11 @@ public void OnMapStart() {
 		HookRespawns();
 }
 
+// Clean memory on map change
+public void OnMapEnd() { delete unusualNames; }
+
 public void OnClientPostAdminCheck(int client) {
+	bPlayerIsSearching[client] = false;
 	pCosmetics[client].ResetAll();
 	
 	// If user still has access to these commands, get their cookie and set their prefs.
@@ -246,6 +259,23 @@ public int EffectHdlr(Menu menu, MenuAction action, int client, int p2) {
 			char sel[32];
 			GetMenuItem(menu, p2, sel, sizeof(sel));
 			
+			// Handle search option
+			if (sel[0] == 's') {
+				// Set boolean for searching to true, this is to intercept their next say command
+				bPlayerIsSearching[client] = true;
+				
+				// Assign information
+				searchInfo[client][0] = iItemDefinitionIndex;
+				searchInfo[client][1] = slot;
+				
+				CPrintToChat(client, "%s Write the {unusual}Unusual Effect{white} name you wish to search for in chat.", PGTAG);
+				CPrintToChat(client, "%s You have 15 seconds before the query expires.", PGTAG);
+				
+				// Create timer to forget about the function.
+				CreateTimer(15.0, ClearSearch, client);
+				return 0;
+			}
+			
 			if (pCosmetics[client].iItemIndex[slot] != iItemDefinitionIndex)
 				pCosmetics[client].ResetFor(slot);
 			
@@ -262,6 +292,54 @@ public int EffectHdlr(Menu menu, MenuAction action, int client, int p2) {
 	}
 
 	return 0;
+}
+
+// Handle effect searching
+public Action OnClientSayCommand(int client, const char[] command, const char[] query) {
+	// Ignore chat messages if this is false.
+	if (!bPlayerIsSearching[client]) return Plugin_Continue;
+	
+	// Is the ArrayList available?
+	if (unusualNames == INVALID_HANDLE) return Plugin_Continue;
+	
+	// Find any match for this query.
+	// Player is no longer searching, deactivate the boolean!
+	bPlayerIsSearching[client] = false;
+	
+	// Create new menu with results for this query.
+	Menu results = new Menu(EffectHdlr);
+	results.SetTitle("Search results for %s", query);
+	
+	int found = 0;
+	for (int i = 0; i < unusualNames.Length; i++) {
+		char name[64], idStr[32];
+		unusualNames.GetString(i, name, sizeof(name));
+		Format(idStr, sizeof(idStr), "%d", unusualIds.Get(i));
+		
+		if (StrContains(name, query, false) != -1)
+			results.AddItem(idStr, name) && found++;
+	}
+	
+	// If no matches, just add empty string.
+	if (!found)
+		results.AddItem("-", "No Unusual Effects found for your query.", ITEMDRAW_DISABLED);
+	
+	// Display the menu!
+	results.ExitButton = true;
+	results.Display(client, MENU_TIME_FOREVER);
+	
+	return Plugin_Stop;
+}
+
+// Search timer expiry
+public Action ClearSearch(Handle timer, any client) {
+	// If the player boolean is false, no need to handle.
+	if (!bPlayerIsSearching[client]) return Plugin_Stop;
+	
+	bPlayerIsSearching[client] = false;
+	
+	CPrintToChat(client, "%s Your search query time has expired.", PGTAG);
+	return Plugin_Handled;
 }
 
 //

@@ -177,6 +177,9 @@ void wWarPaintProtodef(int client, int iItemDefinitionIndex, int slot) {
 	menu.AddItem(idStr, "", ITEMDRAW_IGNORE);
 	menu.AddItem(slotStr, "", ITEMDRAW_IGNORE);
 	
+	// Utilize chat to search for a specific War Paint kit
+	menu.AddItem("search", "Search for a War Paint...");
+	
 	menu.AddItem("-1", "No Override");
 	
 	// Get all valid War Paints at the moment.

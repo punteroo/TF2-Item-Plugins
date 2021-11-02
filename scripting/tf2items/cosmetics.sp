@@ -169,6 +169,8 @@ int teamColors[7][2] = {
 	{12073019, 5801378}, {4732984, 3686984}, {11049612, 8626083}, {3874595, 1581885}, {6637376, 2636109}, {8400928, 2452877}, {12807213, 12091445}
 };
 
+// Globals
+ArrayList unusualNames, unusualIds;
 
 // Functions
 
@@ -328,6 +330,9 @@ void EffectsMenu(int client, const char[] name, int iItemDefinitionIndex, int sl
 	effMenu.AddItem(slotStr, "", ITEMDRAW_IGNORE);
 	effMenu.AddItem(idStr, "", ITEMDRAW_IGNORE);
 	
+	// Utilize chat to search for a specific Unusual effect.
+	effMenu.AddItem("search", "Search for an Unusual Effect...");
+	
 	// add unusual effects respectively
 	AddUnusuals(effMenu, client);
 	
@@ -351,9 +356,13 @@ void AddUnusuals(Menu menu, int client)
 		Format(name, sizeof(name), "Cosmetic_Eff%d", id);
 		Format(idStr, sizeof(idStr), "%d", id);
 		
-		if (TranslationPhraseExists(name))
+		if (TranslationPhraseExists(name)) {
 			Format(name, sizeof(name), "%T", name, client);
-		else {
+			
+			// Push them into a global ArrayList (search feature)
+			unusualNames.PushString(name);
+			unusualIds.Push(id);
+		} else {
 			char system[64];
 			TF2Econ_GetParticleAttributeSystemName(id, system, sizeof(system));
 			
@@ -368,6 +377,9 @@ void AddUnusuals(Menu menu, int client)
 		
 		menu.AddItem(idStr, name);
 	}
+	
+	// Clean memory!
+	delete unusuals;
 }
 
 // AddPaints(Menu menu) - Adds all of the possible paint colors to a menu.
