@@ -3,7 +3,7 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define PLUGIN_VERSION "3.0.2"
+#define PLUGIN_VERSION "3.1.0"
 
 public Plugin myinfo = 
 {
@@ -18,9 +18,6 @@ public Plugin myinfo =
 // GLOBAL DECLARES //
 /////////////////////
 
-// Tag
-#define PGTAG		   "{mythical}[TF2Items]{white}"
-
 // Global Regeneration SDKCall Handle (Used to update items the player has)
 Handle hRegen = INVALID_HANDLE;
 
@@ -29,6 +26,19 @@ CosmeticsInfo pCosmetics[MAXPLAYERS + 1];
 
 // Original Cosmetic Information for every player
 Cosmetic orgCosmetics[MAXPLAYERS + 1][3];
+
+// Global boolean to indicate a player is trying to do a search
+bool bPlayerIsSearching[MAXPLAYERS + 1] = false;
+// Global 2 cell array with item index and slot before the search
+int searchInfo[MAXPLAYERS + 1][2];
+// Global timer Handle for the query timer
+Handle gSearchTimer[MAXPLAYERS + 1] = INVALID_HANDLE;
+
+// Global Handle for the Preferences Cookie
+Handle pPreferences = INVALID_HANDLE;
+
+// Global Late Loading Value
+bool bLateLoad;
 
 // Networkable Server Offsets (used for regen)
 int clipOff;
@@ -45,6 +55,8 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	{
 		SetFailState("This plugin was made for use with Team Fortress 2 only.");
 	}
+	
+	bLateLoad = late;
 }
 
 public void OnPluginStart()
@@ -68,6 +80,25 @@ public void OnPluginStart()
 	LoadTranslations("cosmetics.phrases.txt");
 	LoadTranslations("unusuals.phrases.txt");
 	// Translations!
+	
+	// Occupy memory
+	unusualNames = new ArrayList(64);
+	unusualIds   = new ArrayList();
+	
+	// Handle late loading
+	if (bLateLoad) {
+		OnConfigsExecuted();
+		
+		// Register Preference Saving Cookie
+		pPreferences = CV_UseCookies.BoolValue ? RegClientCookie("tf2item_cosmetics_prefs", "Cosmetic override preferences set for this user.", CookieAccess_Private) : INVALID_HANDLE;
+		
+		for (int i = 1; i < MaxClients; i++) {
+			if (IsClientInGame(i) && !IsClientSourceTV(i) && !IsFakeClient(i))
+				OnClientPostAdminCheck(i);
+		}
+	} else
+		// Register Preference Saving Cookie
+		pPreferences = CV_UseCookies.BoolValue ? RegClientCookie("tf2item_cosmetics_prefs", "Cosmetic override preferences set for this user.", CookieAccess_Private) : INVALID_HANDLE;
 }
 
 // Hook spawns if the ConVar is on
@@ -76,9 +107,27 @@ public void OnMapStart() {
 		HookRespawns();
 }
 
+// Clean memory on map change
+public void OnMapEnd() { delete unusualNames; delete unusualIds; }
+
 public void OnClientPostAdminCheck(int client) {
-	for (int i = 0; i < 3; i++)
-		pCosmetics[client].ResetFor(i);
+	bPlayerIsSearching[client] = false;
+	
+	delete gSearchTimer[client];
+	
+	pCosmetics[client].ResetAll();
+	
+	// If user still has access to these commands, get their cookie and set their prefs.
+	// If permissions have been revoked, or no prefs are saved, just set them null.
+	if ((CheckCommandAccess(client, "sm_cosmetics", ADMFLAG_RESERVATION)
+	 || CheckCommandAccess(client, "sm_hats", ADMFLAG_RESERVATION)
+	 || CheckCommandAccess(client, "sm_myhats", ADMFLAG_RESERVATION)) && pPreferences != INVALID_HANDLE) {
+	 	char cookie[520];
+	 	GetClientCookie(client, pPreferences, cookie, sizeof(cookie));
+	 	
+	 	if (strlen(cookie) > 0)
+	 		ParsePreferenceString(client, cookie);
+	}
 }
 
 /* Only utilized for testing
@@ -212,6 +261,27 @@ public int EffectHdlr(Menu menu, MenuAction action, int client, int p2) {
 			char sel[32];
 			GetMenuItem(menu, p2, sel, sizeof(sel));
 			
+			// Handle search option
+			if (sel[0] == 's') {
+				// Clear timer if it is still running.
+				delete gSearchTimer[client];
+				
+				// Set boolean for searching to true, this is to intercept their next say command
+				bPlayerIsSearching[client] = true;
+				
+				// Assign information
+				searchInfo[client][0] = iItemDefinitionIndex;
+				searchInfo[client][1] = slot;
+				
+				CPrintToChat(client, "%s Write the {unusual}Unusual Effect{white} name you wish to search for in chat.", PGTAG);
+				CPrintToChat(client, "%s You have 15 seconds before the query expires.", PGTAG);
+				
+				// Create timer to forget about the function.
+				if (gSearchTimer[client] == INVALID_HANDLE)
+					gSearchTimer[client] = CreateTimer(15.0, ClearSearch, client);
+				return 0;
+			}
+			
 			if (pCosmetics[client].iItemIndex[slot] != iItemDefinitionIndex)
 				pCosmetics[client].ResetFor(slot);
 			
@@ -228,6 +298,69 @@ public int EffectHdlr(Menu menu, MenuAction action, int client, int p2) {
 	}
 
 	return 0;
+}
+
+// Handle effect searching
+public Action OnClientSayCommand(int client, const char[] command, const char[] query) {
+	// Ignore chat messages if this is false.
+	if (!bPlayerIsSearching[client]) return Plugin_Continue;
+	
+	// Is the ArrayList available?
+	if (unusualNames == INVALID_HANDLE) return Plugin_Continue;
+	
+	// Find any match for this query.
+	// Player is no longer searching, deactivate the boolean!
+	bPlayerIsSearching[client] = false;
+	
+	// Create new menu with results for this query.
+	Menu results = new Menu(EffectHdlr);
+	results.SetTitle("Search results for %s", query);
+	
+	// Data embedding
+	char itemStr[32], slotStr[32];
+	IntToString(searchInfo[client][0], itemStr, sizeof(itemStr));
+	IntToString(searchInfo[client][1], slotStr, sizeof(slotStr));
+	
+	results.AddItem(slotStr, "", ITEMDRAW_IGNORE);
+	results.AddItem(itemStr, "", ITEMDRAW_IGNORE);
+	
+	// Time to query!
+	int found = 0;
+	for (int i = 0; i < unusualNames.Length; i++) {
+		char name[64], idStr[32];
+		unusualNames.GetString(i, name, sizeof(name));
+		Format(idStr, sizeof(idStr), "%d", unusualIds.Get(i));
+		
+		if (StrContains(name, query, false) != -1)
+			results.AddItem(idStr, name) && found++;
+	}
+	
+	// If no matches, just add empty string.
+	if (!found)
+		results.AddItem("-", "No Unusual Effects found for your query.", ITEMDRAW_DISABLED);
+	
+	// Display the menu!
+	results.ExitButton = true;
+	results.Display(client, MENU_TIME_FOREVER);
+	
+	return Plugin_Stop;
+}
+
+// Search timer expiry
+public Action ClearSearch(Handle timer, any client) {
+	// If the player boolean is false, no need to handle.
+	if (!bPlayerIsSearching[client]) {
+		delete gSearchTimer[client];
+		return Plugin_Stop;
+	}
+	
+	bPlayerIsSearching[client] = false;
+	
+	CPrintToChat(client, "%s Your search query time has expired.", PGTAG);
+	
+	delete gSearchTimer[client];
+	
+	return Plugin_Handled;
 }
 
 //
@@ -562,9 +695,18 @@ void OthersMenu(int client, const char[] name, int iItemDefinitionIndex, int slo
 
 // ForceChange() - Forces an SDKCall on the player to get the Unusual effects to be applied instantly.
 void ForceChange(int client, int slot) {
+	// Handle OnlySpawn
 	if (CV_OnlySpawn.BoolValue && !bPlayerInSpawn[client]) {
 		CPrintToChat(client, "%s You are not allowed to make changes outside of spawn!", PGTAG);
 		return;
+	}
+	
+	// Save preferences at this instance
+	if (pPreferences != INVALID_HANDLE && CV_UseCookies.BoolValue) {
+		char prefs[520];
+		PreferencesToString(client, prefs, sizeof(prefs));
+		
+		SetClientCookie(client, pPreferences, prefs);
 	}
 	
 	int ent = -1;
@@ -649,4 +791,91 @@ public Action ForceTimer(Handle timer, any client)
 	delete timer;
 	
 	return Plugin_Stop;
+}
+
+// PreferencesToString() - Gets all settings on the user and stringifies them into a readable string for later parsing.
+//
+// Format:
+// i,i,i|u,u,u|p,p,p|s,s,s|f,f,f|v,v,v
+//
+// Where:
+//	i  = Item Indexes
+//	u  = Unusual Effects
+//	p  = Paint
+//	s  = Spell Paint
+//	f  = Footprints
+//	v  = Voices From Below
+void PreferencesToString(int client, char[] buffer, int size) {
+	// don't look
+	char prefs[520];
+	FormatEx(prefs, sizeof(prefs), "%d,%d,%d|%d,%d,%d|%d,%d,%d|%.1f,%.1f,%.1f|%d,%d,%d|%d,%d,%d",
+			pCosmetics[client].iItemIndex[0], pCosmetics[client].iItemIndex[1], pCosmetics[client].iItemIndex[2],
+			pCosmetics[client].uEffects[0],   pCosmetics[client].uEffects[1],   pCosmetics[client].uEffects[2],
+			pCosmetics[client].cPaint[0],     pCosmetics[client].cPaint[1],     pCosmetics[client].cPaint[2],
+			pCosmetics[client].sPaint[0],     pCosmetics[client].sPaint[1],     pCosmetics[client].sPaint[2],
+			pCosmetics[client].sFoot[0],      pCosmetics[client].sFoot[1],      pCosmetics[client].sFoot[2],
+			pCosmetics[client].sVoices[0],    pCosmetics[client].sVoices[1],    pCosmetics[client].sVoices[2]);
+	
+	strcopy(buffer, size, prefs);
+}
+
+// ParsePreferenceString()
+//
+// Parses a Preferences string and loads it for the client. This should only be called ONCE per client connection.
+void ParsePreferenceString(int client, const char[] prefs) {
+	// please, don't kill me
+	char info[11][64];
+	ExplodeString(prefs, "|", info, sizeof(info), sizeof(info[]));
+	
+	// Since we're parsing, let's validate! We don't want any bad data being passed.
+	
+	// Item Indexes (Validation: Do they exist in schema?)
+	char id[3][16];
+	ExplodeString(info[0], ",", id, sizeof(id), sizeof(id[]));
+	
+	for (int i = 0; i < 3; i++) {
+		int tId = StringToInt(id[i]);
+		
+		if (TF2Econ_IsValidItemDefinition(tId))
+			pCosmetics[client].iItemIndex[i] = tId;
+	}
+	
+	// Unusual Effects
+	char u[3][12];
+	ExplodeString(info[1], ",", u, sizeof(u), sizeof(u[]));
+	
+	for (int i = 0; i < 3; i++)
+		pCosmetics[client].uEffects[i] = StringToInt(u[i]);
+	
+	// Paint Value (Validation: Is the hat paintable?)
+	char p[3][24];
+	ExplodeString(info[2], ",", p, sizeof(p), sizeof(p[]));
+	
+	for (int i = 0; i < 3; i++) {
+		int tP = StringToInt(p[i]);
+		
+		if (IsHatPaintable(StringToInt(id[i])))
+			pCosmetics[client].cPaint[i] = tP;
+	}
+	
+	// Spell Paint
+	char sp[3][24];
+	ExplodeString(info[3], ",", sp, sizeof(sp), sizeof(sp[]));
+	
+	for (int i = 0; i < 3; i++)
+		pCosmetics[client].sPaint[i] = StringToInt(sp[i]);
+	
+	// Footprints
+	char f[3][24];
+	ExplodeString(info[4], ",", f, sizeof(f), sizeof(f[]));
+	
+	for (int i = 0; i < 3; i++) 
+		pCosmetics[client].sFoot[i] = StringToInt(f[i]);
+	
+	// Voices
+	char v[3][4];
+	ExplodeString(info[5], ",", v, sizeof(v), sizeof(v[]));
+	
+	for (int i = 0; i < 3; i++)
+		pCosmetics[client].sVoices[i] = view_as<bool>(StringToInt(v[i]));
 }

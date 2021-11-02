@@ -3,7 +3,7 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define PLUGIN_VERSION "3.0.2"
+#define PLUGIN_VERSION "3.1.0"
 
 public Plugin myinfo = 
 {
@@ -26,6 +26,16 @@ WeaponsInfo pWeapons[MAXPLAYERS + 1];
 
 // Original Weapon Information for every player
 Weapon orgWeapons[MAXPLAYERS + 1][3];
+
+// Global boolean to indicate a player is trying to do a search
+bool bPlayerIsSearching[MAXPLAYERS + 1] = false;
+// Global 2 cell array with item index and slot before the search
+int searchInfo[MAXPLAYERS + 1][2];
+// Global timer Handle for the query timer
+Handle gSearchTimer[MAXPLAYERS + 1] = INVALID_HANDLE;
+
+// Global Handle for the Preferences Cookie
+Handle pPreferences = INVALID_HANDLE;
 
 // Networkable Server Offsets (used for regen)
 int clipOff;
@@ -54,7 +64,7 @@ public void OnPluginStart() {
 	RegAdminCmd("sm_weps", 	  CMD_Weapons, ADMFLAG_RESERVATION, "Opens the Weapons Manager menu.");
 	RegAdminCmd("sm_myweps",  CMD_Weapons, ADMFLAG_RESERVATION, "Opens the Weapons Manager menu.");
 	// Various ways of invoking the command. For user commodity ;)
-	//RegConsoleCmd("sm_my", CMD_Test);
+	// RegConsoleCmd("sm_my", CMD_Test);
 	
 	Handle hGameConf = LoadGameConfigFile("sm-tf2.games");
 	
@@ -69,20 +79,31 @@ public void OnPluginStart() {
 	LoadTranslations("weapons.phrases.txt");
 	// Translations!
 	
+	// Initialize ArrayLists
+	wPaintNames    = new ArrayList(64);
+	wPaintProtoDef = new ArrayList();
+	
 	// Hook onto player spawning / loadout reload (for special weapons to be given correctly)
 	HookEvent("player_spawn", OnPlayerSpawn);
 	HookEvent("post_inventory_application", OnPlayerSpawn);
 	
 	// Late loading reset
 	if (bLateLoad) {
+		OnConfigsExecuted();
+		
+		// Register Preference Saving Cookie
+		pPreferences = CV_UseCookies.BoolValue ? RegClientCookie("tf2item_weapons_prefs", "Weapon override preferences set for this user.", CookieAccess_Private) : INVALID_HANDLE;
+		
 		for (int i = 1; i < MaxClients; i++) {
 			if (IsClientInGame(i) && !IsClientSourceTV(i) && !IsFakeClient(i))
-				pWeapons[i].ResetAll();
+				OnClientPostAdminCheck(i);
 		}
-	}
+	} else
+		// Register Preference Saving Cookie
+		pPreferences = CV_UseCookies.BoolValue ? RegClientCookie("tf2item_weapons_prefs", "Weapon override preferences set for this user.", CookieAccess_Private) : INVALID_HANDLE;
 }
 
-/*public Action CMD_Test(int client, int args) {
+/* public Action CMD_Test(int client, int args) {
 	PrintToConsole(client, "Your Overrides:");
 	PrintToConsole(client, "Item Indexes:   %d, %d, %d", pWeapons[client].iItemIndex[0], pWeapons[client].iItemIndex[1], pWeapons[client].iItemIndex[2]);
 	PrintToConsole(client, "Unusual Weps:   %d, %d, %d", pWeapons[client].uEffects[0], pWeapons[client].uEffects[1], pWeapons[client].uEffects[2]);
@@ -94,8 +115,9 @@ public void OnPluginStart() {
 	PrintToConsole(client, "Ks. Sheen:      %d, %d, %d", pWeapons[client].kSheen[0], pWeapons[client].kSheen[1], pWeapons[client].kSheen[2]);
 	PrintToConsole(client, "Ks. Streaker:   %d, %d, %d", pWeapons[client].kStreaker[0], pWeapons[client].kStreaker[1], pWeapons[client].kStreaker[2]);
 	PrintToConsole(client, "Spell Overr.:   %b, %b, %b", pWeapons[client].sSpells[0], pWeapons[client].sSpells[1], pWeapons[client].sSpells[2]);
+	PrintToConsole(client, "Special Weapon: %d",		 pWeapons[client].Special);
 	return Plugin_Handled;
-}*/
+} */
 
 public Action CMD_Weapons(int client, int args) {
 	if (CV_OnlySpawn.BoolValue && !bPlayerInSpawn[client])
@@ -110,8 +132,27 @@ public void OnMapStart() {
 		HookRespawns();
 }
 
+// Clear ArrayList memory space
+public void OnMapEnd() { delete wPaintNames; delete wPaintProtoDef; }
+
 public void OnClientPostAdminCheck(int client) {
+	bPlayerIsSearching[client] = false;
+	
+	delete gSearchTimer[client];
+	
 	pWeapons[client].ResetAll(true);
+	
+	// If user still has access to these commands, get their cookie and set their prefs.
+	// If permissions have been revoked, or no prefs are saved, just set them null.
+	if ((CheckCommandAccess(client, "sm_weapons", ADMFLAG_RESERVATION)
+	 || CheckCommandAccess(client, "sm_weps", ADMFLAG_RESERVATION)
+	 || CheckCommandAccess(client, "sm_myweps", ADMFLAG_RESERVATION)) && pPreferences != INVALID_HANDLE) {
+	 	char cookie[520];
+	 	GetClientCookie(client, pPreferences, cookie, sizeof(cookie));
+	 	
+	 	if (strlen(cookie) > 0)
+	 		ParsePreferenceString(client, cookie);
+	}
 }
 
 //
@@ -250,6 +291,27 @@ public int wPaintProtoHdlr(Menu menu, MenuAction action, int client, int p2) {
 			char sel[32];
 			GetMenuItem(menu, p2, sel, sizeof(sel));
 			
+			// Handle search option
+			if (sel[0] == 's') {
+				// Clear timer if it is still running.
+				delete gSearchTimer[client];
+				
+				// Set boolean for searching to true, this is to intercept their next say command
+				bPlayerIsSearching[client] = true;
+				
+				// Assign information
+				searchInfo[client][0] = iItemDefinitionIndex;
+				searchInfo[client][1] = slot;
+				
+				CPrintToChat(client, "%s Write the {uncommon}War Paint{white} name you wish to search for in chat.", PGTAG);
+				CPrintToChat(client, "%s You have 15 seconds before the query expires.", PGTAG);
+				
+				// Create timer to forget about the function.
+				if (gSearchTimer[client] == INVALID_HANDLE)
+					gSearchTimer[client] = CreateTimer(15.0, ClearSearch, client);
+				return 0;
+			}
+			
 			if (pWeapons[client].iItemIndex[slot] != iItemDefinitionIndex)
 				pWeapons[client].ResetFor(slot);
 			
@@ -267,6 +329,69 @@ public int wPaintProtoHdlr(Menu menu, MenuAction action, int client, int p2) {
 		case MenuAction_End: delete menu;
 	}
 	return 0;
+}
+
+// Handle War Paint searching
+public Action OnClientSayCommand(int client, const char[] command, const char[] query) {
+	// Ignore chat messages if this is false.
+	if (!bPlayerIsSearching[client]) return Plugin_Continue;
+	
+	// Is the ArrayList available?
+	if (wPaintNames == INVALID_HANDLE) return Plugin_Continue;
+	
+	// Find any match for this query.
+	// Player is no longer searching, deactivate the boolean!
+	bPlayerIsSearching[client] = false;
+	
+	// Create new menu with results for this query.
+	Menu results = new Menu(wPaintProtoHdlr);
+	results.SetTitle("Search results for %s", query);
+	
+	// Data embedding
+	char itemStr[32], slotStr[32];
+	IntToString(searchInfo[client][0], itemStr, sizeof(itemStr));
+	IntToString(searchInfo[client][1], slotStr, sizeof(slotStr));
+	
+	results.AddItem(itemStr, "", ITEMDRAW_IGNORE);
+	results.AddItem(slotStr, "", ITEMDRAW_IGNORE);
+	
+	// Time to query!
+	int found = 0;
+	for (int i = 0; i < wPaintNames.Length; i++) {
+		char name[64], idStr[32];
+		wPaintNames.GetString(i, name, sizeof(name));
+		Format(idStr, sizeof(idStr), "%d", wPaintProtoDef.Get(i));
+		
+		if (StrContains(name, query, false) != -1)
+			results.AddItem(idStr, name) && found++;
+	}
+	
+	// If no matches, just add empty string.
+	if (!found)
+		results.AddItem("-", "No War Paints found for your query.", ITEMDRAW_DISABLED);
+	
+	// Display the menu!
+	results.ExitButton = true;
+	results.Display(client, MENU_TIME_FOREVER);
+	
+	return Plugin_Stop;
+}
+
+// Search timer expiry
+public Action ClearSearch(Handle timer, any client) {
+	// If the player boolean is false, no need to handle.
+	if (!bPlayerIsSearching[client]) {
+		delete gSearchTimer[client];
+		return Plugin_Stop;
+	}
+	
+	bPlayerIsSearching[client] = false;
+	
+	CPrintToChat(client, "%s Your search query time has expired.", PGTAG);
+	
+	delete gSearchTimer[client];
+	
+	return Plugin_Handled;
 }
 
 public int wWarPaintWearHdlr(Menu menu, MenuAction action, int client, int p2) {
@@ -709,9 +834,11 @@ Action ApplyChanges(Handle& hItem, int client, int iItemDefinitionIndex, char[] 
 	// Also, if they have a War Paint override, Australium will not be set.
 	bool hasAussie = pWeapons[client].Aussie[slot] && !hasWarPaint, orgAussie = orgWeapons[client][slot].Aussie;
 	
-	TF2Items_SetAttribute(hItem, 1, 2027, hasAussie ? float(hasAussie) : float(orgAussie));
-	TF2Items_SetAttribute(hItem, 2, 2022, hasAussie ? float(hasAussie) : float(orgAussie));
-	TF2Items_SetAttribute(hItem, 3, 542,  isSpecial ? 0.0 : (hasAussie ? float(hasAussie) : float(orgAussie)));
+	float setAussie = hasAussie ? float(hasAussie) : float(orgAussie);
+	
+	TF2Items_SetAttribute(hItem, 1, 2027, hasWarPaint ? 0.0 : setAussie);
+	TF2Items_SetAttribute(hItem, 2, 2022, hasWarPaint ? 0.0 : setAussie);
+	TF2Items_SetAttribute(hItem, 3, 542,  isSpecial ? 0.0 : (hasWarPaint ? 0.0 : setAussie));
 	
 	// Has Festive Override?
 	bool hasFestive = pWeapons[client].Festive[slot], orgFestive = orgWeapons[client][slot].Festive;
@@ -877,6 +1004,14 @@ void ForceChange(int client, int slot) {
 		return;
 	}
 	
+	// Save user preferences at this point.
+	if (pPreferences != INVALID_HANDLE && CV_UseCookies.BoolValue) {
+		char prefs[520];
+		PreferencesToString(client, prefs, sizeof(prefs));
+		
+		SetClientCookie(client, pPreferences, prefs);
+	}
+	
 	// Get all SOC attribs he had so we check for No Override settings
 	GetOriginalAttributes(client, slot);
 	
@@ -954,6 +1089,140 @@ public Action ForceTimer(Handle timer, DataPack data)
 	
 	// Clean timer
 	return Plugin_Stop;
+}
+
+// PreferencesToString() - Gets all settings on the user and stringifies them into a readable string for later parsing.
+//
+// Format:
+// i,i,i|u,u,u|w,w,w|r,r,r|a,a,a|f,f,f|kt,kt,kt|ks,ks,ks|kr,kr,kr|s,s,s|p
+//
+// Where:
+//	i  = Item Indexes
+//	u  = Unusual Effects
+//	w  = War Paint
+//	r  = War Paint Wear
+//	a  = Australium Preference
+//	f  = Festivized Preference
+//	kt = Killstreak Type
+//	ks = Killstreak Sheen
+//	kr = Killstreaker
+//	s  = Spell Bitfields
+//	p  = Special Weapon
+void PreferencesToString(int client, char[] buffer, int size) {
+	// don't look
+	char prefs[520];
+	FormatEx(prefs, sizeof(prefs), "%d,%d,%d|%d,%d,%d|%d,%d,%d|%.1f,%.1f,%.1f|%d,%d,%d|%d,%d,%d|%d,%d,%d|%d,%d,%d|%d,%d,%d|%d,%d,%d|%d",
+			pWeapons[client].iItemIndex[0], pWeapons[client].iItemIndex[1], pWeapons[client].iItemIndex[2],
+			pWeapons[client].uEffects[0],   pWeapons[client].uEffects[1],   pWeapons[client].uEffects[2],
+			pWeapons[client].wPaint[0],     pWeapons[client].wPaint[1],     pWeapons[client].wPaint[2],
+			pWeapons[client].wWear[0],      pWeapons[client].wWear[1],      pWeapons[client].wWear[2],
+			pWeapons[client].Aussie[0],     pWeapons[client].Aussie[1],     pWeapons[client].Aussie[2],
+			pWeapons[client].Festive[0],    pWeapons[client].Festive[1],    pWeapons[client].Festive[2],
+			pWeapons[client].kType[0],      pWeapons[client].kType[1],      pWeapons[client].kType[2],
+			pWeapons[client].kSheen[0],     pWeapons[client].kSheen[1],     pWeapons[client].kSheen[2],
+			pWeapons[client].kStreaker[0],  pWeapons[client].kStreaker[1],  pWeapons[client].kStreaker[2],
+			pWeapons[client].sSpells[0],    pWeapons[client].sSpells[1],    pWeapons[client].sSpells[2],
+			pWeapons[client].Special);
+	
+	strcopy(buffer, size, prefs);
+}
+
+// ParsePreferenceString()
+//
+// Parses a Preferences string and loads it for the client. This should only be called ONCE per client connection.
+void ParsePreferenceString(int client, const char[] prefs) {
+	// please, don't kill me
+	char info[11][64];
+	ExplodeString(prefs, "|", info, sizeof(info), sizeof(info[]));
+	
+	// Since we're parsing, let's validate! We don't want any bad data being passed.
+	
+	// Item Indexes (Validation: Do they exist in schema?)
+	char id[3][12];
+	ExplodeString(info[0], ",", id, sizeof(id), sizeof(id[]));
+	
+	for (int i = 0; i < 3; i++) {
+		int tId = StringToInt(id[i]);
+		
+		if (TF2Econ_IsValidItemDefinition(tId))
+			pWeapons[client].iItemIndex[i] = tId;
+	}
+	
+	// Unusual Effects
+	char u[3][12];
+	ExplodeString(info[1], ",", u, sizeof(u), sizeof(u[]));
+	
+	for (int i = 0; i < 3; i++)
+		pWeapons[client].uEffects[i] = StringToInt(u[i]);
+	
+	// War Paints (Validation: Are they a listed translation? Can this weapon be War Painted?)
+	char w[3][12];
+	ExplodeString(info[2], ",", w, sizeof(w), sizeof(w[]));
+	
+	for (int i = 0; i < 3; i++) {
+		int tW = StringToInt(w[i]);
+		
+		if (TranslationPhraseExists(w[i]) && CanBePainted(StringToInt(id[i])))
+			pWeapons[client].wPaint[i] = tW;
+	}
+	
+	// War Paint Wear
+	char wear[3][12];
+	ExplodeString(info[3], ",", wear, sizeof(wear), sizeof(wear[]));
+	
+	for (int i = 0; i < 3; i++)
+		pWeapons[client].wWear[i] = StringToFloat(wear[i]);
+	
+	// Australium (Validation: Can this weapon be australium?)
+	char a[3][4];
+	ExplodeString(info[4], ",", a, sizeof(a), sizeof(a[]));
+	
+	for (int i = 0; i < 3; i++) {
+		int tId = StringToInt(id[i]);
+		if (CanBeAustralium(tId))
+			pWeapons[client].Aussie[i] = view_as<bool>(StringToInt(a[i]));
+	}
+	
+	// Festivized (Validation: Can this weapon be festivized?)
+	char f[3][4];
+	ExplodeString(info[5], ",", f, sizeof(f), sizeof(f[]));
+	
+	for (int i = 0; i < 3; i++) {
+		if (CanBeFestivized(StringToInt(id[i])))
+			pWeapons[client].Festive[i] = view_as<bool>(StringToInt(f[i]));
+	}
+	
+	// Killstreak Type
+	char kT[3][12];
+	ExplodeString(info[6], ",", kT, sizeof(kT), sizeof(kT[]));
+	
+	for (int i = 0; i < 3; i++)
+		pWeapons[client].kType[i] = StringToInt(kT[i]);
+	
+	// Killstreak Sheen
+	char kS[3][12];
+	ExplodeString(info[7], ",", kS, sizeof(kS), sizeof(kS[]));
+	
+	for (int i = 0; i < 3; i++)
+		pWeapons[client].kSheen[i] = StringToInt(kS[i]);
+	
+	// Killstreaker
+	char kR[3][12];
+	ExplodeString(info[8], ",", kR, sizeof(kR), sizeof(kR[]));
+	
+	for (int i = 0; i < 3; i++)
+		pWeapons[client].kStreaker[i] = StringToInt(kR[i]);
+	
+	// Spells
+	char s[3][12];
+	ExplodeString(info[9], ",", s, sizeof(s), sizeof(s[]));
+	
+	for (int i = 0; i < 3; i++)
+		pWeapons[client].sSpells[i] = StringToInt(s[i]);
+	
+	// Special Weapon (it's alone, no commas)
+	int special = StringToInt(info[10]);
+	pWeapons[client].Special = special > 0 ? StringToInt(info[9]) : -1;
 }
 
 // mMainMenu - Main menu for all users. Allows them to select one of their weapons to begin modifying them.

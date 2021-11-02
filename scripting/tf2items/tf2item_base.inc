@@ -2,6 +2,7 @@
 #include <lang>
 #include <tf2_stocks>
 #include <sdkhooks>
+#include <clientprefs>
 
 #include <morecolors>
 
@@ -11,6 +12,21 @@
 
 /*
  * Change-Log
+ *
+ * 3.1.0 - 02/11/21
+ * General
+ *  - Implemented search functionality for Unusual effects and War Paints.
+ *    - Players can now select an option and type their query on chat to search for specific entries.
+ *    - Players have 15 seconds before this query expires.
+ *  - Implemented preference saving.
+ *    - Added a new ConVar: tf2items_save_preferences
+ *      - Controls if both plugins will utilize the Cookies system to keep user preferences. Requires plugin reload on change.
+ *    - Player selections and overrides will be saved after making any change to their modifications.
+ *  - Fixed #11
+ *    - Plugins late loading would throw an Invalid ConVar error due to it not being declared before hand on late loading.
+ *  - Bug fixes and more memory management to prevent leaks.
+ * tf2item_weapons
+ *  - Fixed setting War Paints on real Australium weapons not being displayed due to bad logic handling.
  *
  * 3.0.2 - 14/10/21
  * tf2item_weapons
@@ -44,7 +60,7 @@
 bool bPlayerInSpawn[MAXPLAYERS + 1] = false;
 
 // I am now officially a student of dark arts. Don't thank me, thank my master: Scag :)
-stock ConVar CV_OnlySpawn, CV_LogMissingTranslations,
+stock ConVar CV_OnlySpawn, CV_LogMissingTranslations, CV_UseCookies,
 
 CV_Cosmetics_Unusuals, CV_Cosmetics_Paint, CV_Cosmetics_Spells, CV_Cosmetics_ShowIDs, CV_Cosmetics_UParticles;
 
@@ -55,7 +71,8 @@ public void OnConfigsExecuted() {
 	CV_OnlySpawn              = CreateConVar("tf2items_general_onlyspawn", "0", "Controls wether players can only modify their items inside spawn boundaries. Default is 1.", _, true, 0.0, true, 1.0);
 	CV_LogMissingTranslations = CreateConVar("tf2items_cosmetics_show_missing_particles", "0", "Logs to the server whenever a parsed Unusual Particle/War Paint ID does not have an" ...
 																							 " existing translation for their name. I recommend leaving this off, as it causes" ...
-																							 " too much console spam and should only be used to debug. Default is 0.", _, true, 0.0, true, 1.0);
+																							 " too much console spam and should only be used to debug. Default is 0.", _, true, 0.0, true, 1.0),
+	CV_UseCookies			  = CreateConVar("tf2items_save_preferences", "1", "Enables the use of Player Cookies to save selected preferences. Default is 1.", _, true, 0.0, false, 1.0);
 	
 	// Cosmetics Manager
 	CV_Cosmetics_Unusuals   = CreateConVar("tf2items_cosmetics_unusuals", "1", "Are unusual overrides enabled? Default is 1.", _, true, 0.0, true, 1.0);
