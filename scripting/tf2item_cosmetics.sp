@@ -30,6 +30,9 @@ CosmeticsInfo pCosmetics[MAXPLAYERS + 1];
 // Original Cosmetic Information for every player
 Cosmetic orgCosmetics[MAXPLAYERS + 1][3];
 
+// Global Handle for the Preferences Cookie
+Handle pPreferences = INVALID_HANDLE;
+
 // Networkable Server Offsets (used for regen)
 int clipOff;
 int ammoOff;
@@ -68,6 +71,9 @@ public void OnPluginStart()
 	LoadTranslations("cosmetics.phrases.txt");
 	LoadTranslations("unusuals.phrases.txt");
 	// Translations!
+	
+	// Register Preference Saving Cookie
+	pPreferences = CV_UseCookies.BoolValue ? RegClientCookie("tf2item_cosmetics_prefs", "Cosmetic override preferences set for this user.", CookieAccess_Private) : INVALID_HANDLE;
 }
 
 // Hook spawns if the ConVar is on
@@ -77,8 +83,19 @@ public void OnMapStart() {
 }
 
 public void OnClientPostAdminCheck(int client) {
-	for (int i = 0; i < 3; i++)
-		pCosmetics[client].ResetFor(i);
+	pCosmetics[client].ResetAll();
+	
+	// If user still has access to these commands, get their cookie and set their prefs.
+	// If permissions have been revoked, or no prefs are saved, just set them null.
+	if ((CheckCommandAccess(client, "sm_cosmetics", ADMFLAG_RESERVATION)
+	 || CheckCommandAccess(client, "sm_hats", ADMFLAG_RESERVATION)
+	 || CheckCommandAccess(client, "sm_myhats", ADMFLAG_RESERVATION)) && pPreferences != INVALID_HANDLE) {
+	 	char cookie[520];
+	 	GetClientCookie(client, pPreferences, cookie, sizeof(cookie));
+	 	
+	 	if (strlen(cookie) > 0)
+	 		ParsePreferenceString(client, cookie);
+	}
 }
 
 /* Only utilized for testing
@@ -562,9 +579,18 @@ void OthersMenu(int client, const char[] name, int iItemDefinitionIndex, int slo
 
 // ForceChange() - Forces an SDKCall on the player to get the Unusual effects to be applied instantly.
 void ForceChange(int client, int slot) {
+	// Handle OnlySpawn
 	if (CV_OnlySpawn.BoolValue && !bPlayerInSpawn[client]) {
 		CPrintToChat(client, "%s You are not allowed to make changes outside of spawn!", PGTAG);
 		return;
+	}
+	
+	// Save preferences at this instance
+	if (pPreferences != INVALID_HANDLE && CV_UseCookies.BoolValue) {
+		char prefs[520];
+		PreferencesToString(client, prefs, sizeof(prefs));
+		
+		SetClientCookie(client, pPreferences, prefs);
 	}
 	
 	int ent = -1;
@@ -649,4 +675,91 @@ public Action ForceTimer(Handle timer, any client)
 	delete timer;
 	
 	return Plugin_Stop;
+}
+
+// PreferencesToString() - Gets all settings on the user and stringifies them into a readable string for later parsing.
+//
+// Format:
+// i,i,i|u,u,u|p,p,p|s,s,s|f,f,f|v,v,v
+//
+// Where:
+//	i  = Item Indexes
+//	u  = Unusual Effects
+//	p  = Paint
+//	s  = Spell Paint
+//	f  = Footprints
+//	v  = Voices From Below
+void PreferencesToString(int client, char[] buffer, int size) {
+	// don't look
+	char prefs[520];
+	FormatEx(prefs, sizeof(prefs), "%d,%d,%d|%d,%d,%d|%d,%d,%d|%.1f,%.1f,%.1f|%d,%d,%d|%d,%d,%d",
+			pCosmetics[client].iItemIndex[0], pCosmetics[client].iItemIndex[1], pCosmetics[client].iItemIndex[2],
+			pCosmetics[client].uEffects[0],   pCosmetics[client].uEffects[1],   pCosmetics[client].uEffects[2],
+			pCosmetics[client].cPaint[0],     pCosmetics[client].cPaint[1],     pCosmetics[client].cPaint[2],
+			pCosmetics[client].sPaint[0],     pCosmetics[client].sPaint[1],     pCosmetics[client].sPaint[2],
+			pCosmetics[client].sFoot[0],      pCosmetics[client].sFoot[1],      pCosmetics[client].sFoot[2],
+			pCosmetics[client].sVoices[0],    pCosmetics[client].sVoices[1],    pCosmetics[client].sVoices[2]);
+	
+	strcopy(buffer, size, prefs);
+}
+
+// ParsePreferenceString()
+//
+// Parses a Preferences string and loads it for the client. This should only be called ONCE per client connection.
+void ParsePreferenceString(int client, const char[] prefs) {
+	// please, don't kill me
+	char info[11][64];
+	ExplodeString(prefs, "|", info, sizeof(info), sizeof(info[]));
+	
+	// Since we're parsing, let's validate! We don't want any bad data being passed.
+	
+	// Item Indexes (Validation: Do they exist in schema?)
+	char id[3][16];
+	ExplodeString(info[0], ",", id, sizeof(id), sizeof(id[]));
+	
+	for (int i = 0; i < 3; i++) {
+		int tId = StringToInt(id[i]);
+		
+		if (TF2Econ_IsValidItemDefinition(tId))
+			pCosmetics[client].iItemIndex[i] = tId;
+	}
+	
+	// Unusual Effects
+	char u[3][12];
+	ExplodeString(info[1], ",", u, sizeof(u), sizeof(u[]));
+	
+	for (int i = 0; i < 3; i++)
+		pCosmetics[client].uEffects[i] = StringToInt(u[i]);
+	
+	// Paint Value (Validation: Is the hat paintable?)
+	char p[3][24];
+	ExplodeString(info[2], ",", p, sizeof(p), sizeof(p[]));
+	
+	for (int i = 0; i < 3; i++) {
+		int tP = StringToInt(p[i]);
+		
+		if (IsHatPaintable(StringToInt(id[i])))
+			pCosmetics[client].cPaint[i] = tP;
+	}
+	
+	// Spell Paint
+	char sp[3][24];
+	ExplodeString(info[3], ",", sp, sizeof(sp), sizeof(sp[]));
+	
+	for (int i = 0; i < 3; i++)
+		pCosmetics[client].sPaint[i] = StringToFloat(sp[i]);
+	
+	// Footprints
+	char f[3][24];
+	ExplodeString(info[4], ",", f, sizeof(f), sizeof(f[]));
+	
+	for (int i = 0; i < 3; i++) 
+		pCosmetics[client].sFoot[i] = StringToInt(f[i]);
+	
+	// Voices
+	char v[3][4];
+	ExplodeString(info[5], ",", v, sizeof(v), sizeof(v[]));
+	
+	for (int i = 0; i < 3; i++)
+		pCosmetics[client].sVoices[i] = view_as<bool>(StringToInt(v[i]));
 }

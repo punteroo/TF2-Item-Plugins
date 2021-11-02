@@ -897,7 +897,7 @@ void ForceChange(int client, int slot) {
 	}
 	
 	// Save user preferences at this point.
-	if (CV_UseCookies.BoolValue) {
+	if (pPreferences != INVALID_HANDLE && CV_UseCookies.BoolValue) {
 		char prefs[520];
 		PreferencesToString(client, prefs, sizeof(prefs));
 		
