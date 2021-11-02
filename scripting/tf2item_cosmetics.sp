@@ -33,6 +33,9 @@ Cosmetic orgCosmetics[MAXPLAYERS + 1][3];
 // Global Handle for the Preferences Cookie
 Handle pPreferences = INVALID_HANDLE;
 
+// Global Late Loading Value
+bool bLateLoad;
+
 // Networkable Server Offsets (used for regen)
 int clipOff;
 int ammoOff;
@@ -48,6 +51,8 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	{
 		SetFailState("This plugin was made for use with Team Fortress 2 only.");
 	}
+	
+	bLateLoad = late;
 }
 
 public void OnPluginStart()
@@ -72,8 +77,20 @@ public void OnPluginStart()
 	LoadTranslations("unusuals.phrases.txt");
 	// Translations!
 	
-	// Register Preference Saving Cookie
-	pPreferences = CV_UseCookies.BoolValue ? RegClientCookie("tf2item_cosmetics_prefs", "Cosmetic override preferences set for this user.", CookieAccess_Private) : INVALID_HANDLE;
+	// Handle late loading
+	if (bLateLoad) {
+		OnConfigsExecuted();
+		
+		// Register Preference Saving Cookie
+		pPreferences = CV_UseCookies.BoolValue ? RegClientCookie("tf2item_cosmetics_prefs", "Cosmetic override preferences set for this user.", CookieAccess_Private) : INVALID_HANDLE;
+		
+		for (int i = 1; i < MaxClients; i++) {
+			if (IsClientInGame(i) && !IsClientSourceTV(i) && !IsFakeClient(i))
+				OnClientPostAdminCheck(i);
+		}
+	} else
+		// Register Preference Saving Cookie
+		pPreferences = CV_UseCookies.BoolValue ? RegClientCookie("tf2item_cosmetics_prefs", "Cosmetic override preferences set for this user.", CookieAccess_Private) : INVALID_HANDLE;
 }
 
 // Hook spawns if the ConVar is on

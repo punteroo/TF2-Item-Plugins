@@ -76,16 +76,20 @@ public void OnPluginStart() {
 	HookEvent("player_spawn", OnPlayerSpawn);
 	HookEvent("post_inventory_application", OnPlayerSpawn);
 	
-	// Register Preference Saving Cookie
-	pPreferences = CV_UseCookies.BoolValue ? RegClientCookie("tf2item_weapons_prefs", "Weapon override preferences set for this user.", CookieAccess_Private) : INVALID_HANDLE;
-	
 	// Late loading reset
 	if (bLateLoad) {
+		OnConfigsExecuted();
+		
+		// Register Preference Saving Cookie
+		pPreferences = CV_UseCookies.BoolValue ? RegClientCookie("tf2item_weapons_prefs", "Weapon override preferences set for this user.", CookieAccess_Private) : INVALID_HANDLE;
+		
 		for (int i = 1; i < MaxClients; i++) {
 			if (IsClientInGame(i) && !IsClientSourceTV(i) && !IsFakeClient(i))
 				OnClientPostAdminCheck(i);
 		}
-	}
+	} else
+		// Register Preference Saving Cookie
+		pPreferences = CV_UseCookies.BoolValue ? RegClientCookie("tf2item_weapons_prefs", "Weapon override preferences set for this user.", CookieAccess_Private) : INVALID_HANDLE;
 }
 
 /* public Action CMD_Test(int client, int args) {
