@@ -18,9 +18,6 @@ public Plugin myinfo =
 // GLOBAL DECLARES //
 /////////////////////
 
-// Tag
-#define PGTAG		   "{mythical}[TF2Items]{white}"
-
 // Global Regeneration SDKCall Handle (Used to update items the player has)
 Handle hRegen = INVALID_HANDLE;
 

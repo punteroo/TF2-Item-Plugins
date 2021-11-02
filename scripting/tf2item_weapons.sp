@@ -27,6 +27,13 @@ WeaponsInfo pWeapons[MAXPLAYERS + 1];
 // Original Weapon Information for every player
 Weapon orgWeapons[MAXPLAYERS + 1][3];
 
+// Global boolean to indicate a player is trying to do a search
+bool bPlayerIsSearching[MAXPLAYERS + 1] = false;
+// Global 2 cell array with item index and slot before the search
+int searchInfo[MAXPLAYERS + 1][2];
+// Global timer Handle for the query timer
+Handle gSearchTimer[MAXPLAYERS + 1] = INVALID_HANDLE;
+
 // Global Handle for the Preferences Cookie
 Handle pPreferences = INVALID_HANDLE;
 
@@ -71,6 +78,10 @@ public void OnPluginStart() {
 	
 	LoadTranslations("weapons.phrases.txt");
 	// Translations!
+	
+	// Initialize ArrayLists
+	wPaintNames    = new ArrayList(64);
+	wPaintProtoDef = new ArrayList();
 	
 	// Hook onto player spawning / loadout reload (for special weapons to be given correctly)
 	HookEvent("player_spawn", OnPlayerSpawn);
@@ -120,6 +131,9 @@ public void OnMapStart() {
 	if (CV_OnlySpawn.BoolValue)
 		HookRespawns();
 }
+
+// Clear ArrayList memory space
+public void OnMapEnd() { delete wPaintNames; delete wPaintProtoDef; }
 
 public void OnClientPostAdminCheck(int client) {
 	pWeapons[client].ResetAll(true);
@@ -273,6 +287,27 @@ public int wPaintProtoHdlr(Menu menu, MenuAction action, int client, int p2) {
 			char sel[32];
 			GetMenuItem(menu, p2, sel, sizeof(sel));
 			
+			// Handle search option
+			if (sel[0] == 's') {
+				// Clear timer if it is still running.
+				delete gSearchTimer[client];
+				
+				// Set boolean for searching to true, this is to intercept their next say command
+				bPlayerIsSearching[client] = true;
+				
+				// Assign information
+				searchInfo[client][0] = iItemDefinitionIndex;
+				searchInfo[client][1] = slot;
+				
+				CPrintToChat(client, "%s Write the {uncommon}War Paint{white} name you wish to search for in chat.", PGTAG);
+				CPrintToChat(client, "%s You have 15 seconds before the query expires.", PGTAG);
+				
+				// Create timer to forget about the function.
+				if (gSearchTimer[client] == INVALID_HANDLE)
+					gSearchTimer[client] = CreateTimer(15.0, ClearSearch, client);
+				return 0;
+			}
+			
 			if (pWeapons[client].iItemIndex[slot] != iItemDefinitionIndex)
 				pWeapons[client].ResetFor(slot);
 			
@@ -290,6 +325,69 @@ public int wPaintProtoHdlr(Menu menu, MenuAction action, int client, int p2) {
 		case MenuAction_End: delete menu;
 	}
 	return 0;
+}
+
+// Handle War Paint searching
+public Action OnClientSayCommand(int client, const char[] command, const char[] query) {
+	// Ignore chat messages if this is false.
+	if (!bPlayerIsSearching[client]) return Plugin_Continue;
+	
+	// Is the ArrayList available?
+	if (wPaintNames == INVALID_HANDLE) return Plugin_Continue;
+	
+	// Find any match for this query.
+	// Player is no longer searching, deactivate the boolean!
+	bPlayerIsSearching[client] = false;
+	
+	// Create new menu with results for this query.
+	Menu results = new Menu(wPaintProtoHdlr);
+	results.SetTitle("Search results for %s", query);
+	
+	// Data embedding
+	char itemStr[32], slotStr[32];
+	IntToString(searchInfo[client][0], itemStr, sizeof(itemStr));
+	IntToString(searchInfo[client][1], slotStr, sizeof(slotStr));
+	
+	results.AddItem(itemStr, "", ITEMDRAW_IGNORE);
+	results.AddItem(slotStr, "", ITEMDRAW_IGNORE);
+	
+	// Time to query!
+	int found = 0;
+	for (int i = 0; i < wPaintNames.Length; i++) {
+		char name[64], idStr[32];
+		wPaintNames.GetString(i, name, sizeof(name));
+		Format(idStr, sizeof(idStr), "%d", wPaintProtoDef.Get(i));
+		
+		if (StrContains(name, query, false) != -1)
+			results.AddItem(idStr, name) && found++;
+	}
+	
+	// If no matches, just add empty string.
+	if (!found)
+		results.AddItem("-", "No War Paints found for your query.", ITEMDRAW_DISABLED);
+	
+	// Display the menu!
+	results.ExitButton = true;
+	results.Display(client, MENU_TIME_FOREVER);
+	
+	return Plugin_Stop;
+}
+
+// Search timer expiry
+public Action ClearSearch(Handle timer, any client) {
+	// If the player boolean is false, no need to handle.
+	if (!bPlayerIsSearching[client]) {
+		delete gSearchTimer[client];
+		return Plugin_Stop;
+	}
+	
+	bPlayerIsSearching[client] = false;
+	
+	CPrintToChat(client, "%s Your search query time has expired.", PGTAG);
+	
+	delete gSearchTimer[client];
+	
+	return Plugin_Handled;
 }
 
 public int wWarPaintWearHdlr(Menu menu, MenuAction action, int client, int p2) {

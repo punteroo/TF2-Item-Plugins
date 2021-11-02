@@ -14,6 +14,9 @@
 #define MAX_WEAPONS            3
 #define INVALID_WEAPON_ENTITY -1
 
+// Global ArrayLists
+ArrayList wPaintNames, wPaintProtoDef;
+
 // Weapon
 //
 //  Represents a single weapon instance for the user.
@@ -182,17 +185,27 @@ void wWarPaintProtodef(int client, int iItemDefinitionIndex, int slot) {
 	
 	menu.AddItem("-1", "No Override");
 	
+	// Clear search ArrayList values
+	wPaintNames.Clear();
+	wPaintProtoDef.Clear();
+	
 	// Get all valid War Paints at the moment.
 	ArrayList paints = TF2Econ_GetPaintKitDefinitionList();
 	for (int i = 0; i < paints.Length; i++) {
+		int protodef = paints.Get(i);
+		
 		char pStr[12];
-		IntToString(paints.Get(i), pStr, sizeof(pStr));
+		IntToString(protodef, pStr, sizeof(pStr));
 		
 		if (TranslationPhraseExists(pStr)) {
 			char pName[64];
 			Format(pName, sizeof(pName), "%T", pStr, client);
 			
 			menu.AddItem(pStr, pName);
+			
+			// Save into ArrayList
+			wPaintNames.PushString(pName);
+			wPaintProtoDef.Push(protodef);
 		} else if (CV_LogMissingTranslations.BoolValue)
 			LogError("[TF2Weapons] Error while adding Paint Kit %s. Translation is missing. Paint Kit will not be added to the menu.", pStr);
 	}
