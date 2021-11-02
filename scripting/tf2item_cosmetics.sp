@@ -747,7 +747,7 @@ void ParsePreferenceString(int client, const char[] prefs) {
 	ExplodeString(info[3], ",", sp, sizeof(sp), sizeof(sp[]));
 	
 	for (int i = 0; i < 3; i++)
-		pCosmetics[client].sPaint[i] = StringToFloat(sp[i]);
+		pCosmetics[client].sPaint[i] = StringToInt(sp[i]);
 	
 	// Footprints
 	char f[3][24];
