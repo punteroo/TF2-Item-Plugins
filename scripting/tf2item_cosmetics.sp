@@ -112,6 +112,9 @@ public void OnMapEnd() { delete unusualNames; delete unusualIds; }
 
 public void OnClientPostAdminCheck(int client) {
 	bPlayerIsSearching[client] = false;
+	
+	delete gSearchTimer[client];
+	
 	pCosmetics[client].ResetAll();
 	
 	// If user still has access to these commands, get their cookie and set their prefs.

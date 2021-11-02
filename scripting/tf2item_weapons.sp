@@ -136,6 +136,10 @@ public void OnMapStart() {
 public void OnMapEnd() { delete wPaintNames; delete wPaintProtoDef; }
 
 public void OnClientPostAdminCheck(int client) {
+	bPlayerIsSearching[client] = false;
+	
+	delete gSearchTimer[client];
+	
 	pWeapons[client].ResetAll(true);
 	
 	// If user still has access to these commands, get their cookie and set their prefs.
