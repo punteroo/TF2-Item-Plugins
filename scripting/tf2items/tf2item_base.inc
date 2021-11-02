@@ -45,7 +45,7 @@
 bool bPlayerInSpawn[MAXPLAYERS + 1] = false;
 
 // I am now officially a student of dark arts. Don't thank me, thank my master: Scag :)
-stock ConVar CV_OnlySpawn, CV_LogMissingTranslations,
+stock ConVar CV_OnlySpawn, CV_LogMissingTranslations, CV_UseCookies,
 
 CV_Cosmetics_Unusuals, CV_Cosmetics_Paint, CV_Cosmetics_Spells, CV_Cosmetics_ShowIDs, CV_Cosmetics_UParticles;
 
@@ -56,7 +56,8 @@ public void OnConfigsExecuted() {
 	CV_OnlySpawn              = CreateConVar("tf2items_general_onlyspawn", "0", "Controls wether players can only modify their items inside spawn boundaries. Default is 1.", _, true, 0.0, true, 1.0);
 	CV_LogMissingTranslations = CreateConVar("tf2items_cosmetics_show_missing_particles", "0", "Logs to the server whenever a parsed Unusual Particle/War Paint ID does not have an" ...
 																							 " existing translation for their name. I recommend leaving this off, as it causes" ...
-																							 " too much console spam and should only be used to debug. Default is 0.", _, true, 0.0, true, 1.0);
+																							 " too much console spam and should only be used to debug. Default is 0.", _, true, 0.0, true, 1.0),
+	CV_UseCookies			  = CreateConVar("tf2items_save_preferences", "1", "Enables the use of Player Cookies to save selected preferences. Default is 1.", _, true, 0.0, false, 1.0);
 	
 	// Cosmetics Manager
 	CV_Cosmetics_Unusuals   = CreateConVar("tf2items_cosmetics_unusuals", "1", "Are unusual overrides enabled? Default is 1.", _, true, 0.0, true, 1.0);

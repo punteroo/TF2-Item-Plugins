@@ -77,7 +77,7 @@ public void OnPluginStart() {
 	HookEvent("post_inventory_application", OnPlayerSpawn);
 	
 	// Register Preference Saving Cookie
-	pPreferences = RegClientCookie("tf2item_weapons_prefs", "Weapon override preferences set for this user.", CookieAccess_Private);
+	pPreferences = CV_UseCookies.BoolValue ? RegClientCookie("tf2item_weapons_prefs", "Weapon override preferences set for this user.", CookieAccess_Private) : INVALID_HANDLE;
 	
 	// Late loading reset
 	if (bLateLoad) {
@@ -122,9 +122,9 @@ public void OnClientPostAdminCheck(int client) {
 	
 	// If user still has access to these commands, get their cookie and set their prefs.
 	// If permissions have been revoked, or no prefs are saved, just set them null.
-	if (CheckCommandAccess(client, "sm_weapons", ADMFLAG_RESERVATION)
+	if ((CheckCommandAccess(client, "sm_weapons", ADMFLAG_RESERVATION)
 	 || CheckCommandAccess(client, "sm_weps", ADMFLAG_RESERVATION)
-	 || CheckCommandAccess(client, "sm_myweps", ADMFLAG_RESERVATION)) {
+	 || CheckCommandAccess(client, "sm_myweps", ADMFLAG_RESERVATION)) && pPreferences != INVALID_HANDLE) {
 	 	char cookie[520];
 	 	GetClientCookie(client, pPreferences, cookie, sizeof(cookie));
 	 	
@@ -897,10 +897,12 @@ void ForceChange(int client, int slot) {
 	}
 	
 	// Save user preferences at this point.
-	char prefs[520];
-	PreferencesToString(client, prefs, sizeof(prefs));
-	
-	SetClientCookie(client, pPreferences, prefs);
+	if (CV_UseCookies.BoolValue) {
+		char prefs[520];
+		PreferencesToString(client, prefs, sizeof(prefs));
+		
+		SetClientCookie(client, pPreferences, prefs);
+	}
 	
 	// Get all SOC attribs he had so we check for No Override settings
 	GetOriginalAttributes(client, slot);
