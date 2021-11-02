@@ -13,6 +13,21 @@
 /*
  * Change-Log
  *
+ * 3.1.0 - 02/11/21
+ * General
+ *  - Implemented search functionality for Unusual effects and War Paints.
+ *    - Players can now select an option and type their query on chat to search for specific entries.
+ *    - Players have 15 seconds before this query expires.
+ *  - Implemented preference saving.
+ *    - Added a new ConVar: tf2items_save_preferences
+ *      - Controls if both plugins will utilize the Cookies system to keep user preferences. Requires plugin reload on change.
+ *    - Player selections and overrides will be saved after making any change to their modifications.
+ *  - Fixed #11
+ *    - Plugins late loading would throw an Invalid ConVar error due to it not being declared before hand on late loading.
+ *  - Bug fixes and more memory management to prevent leaks.
+ * tf2item_weapons
+ *  - Fixed setting War Paints on real Australium weapons not being displayed due to bad logic handling.
+ *
  * 3.0.2 - 14/10/21
  * tf2item_weapons
  *  - Fixed a wrongly initialized value for connecting players causing them to recieve a stock bat regardless of class.
