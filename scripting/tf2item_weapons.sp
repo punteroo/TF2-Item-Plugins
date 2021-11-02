@@ -830,9 +830,11 @@ Action ApplyChanges(Handle& hItem, int client, int iItemDefinitionIndex, char[] 
 	// Also, if they have a War Paint override, Australium will not be set.
 	bool hasAussie = pWeapons[client].Aussie[slot] && !hasWarPaint, orgAussie = orgWeapons[client][slot].Aussie;
 	
-	TF2Items_SetAttribute(hItem, 1, 2027, hasAussie ? float(hasAussie) : float(orgAussie));
-	TF2Items_SetAttribute(hItem, 2, 2022, hasAussie ? float(hasAussie) : float(orgAussie));
-	TF2Items_SetAttribute(hItem, 3, 542,  isSpecial ? 0.0 : (hasAussie ? float(hasAussie) : float(orgAussie)));
+	float setAussie = hasAussie ? float(hasAussie) : float(orgAussie);
+	
+	TF2Items_SetAttribute(hItem, 1, 2027, hasWarPaint ? 0.0 : setAussie);
+	TF2Items_SetAttribute(hItem, 2, 2022, hasWarPaint ? 0.0 : setAussie);
+	TF2Items_SetAttribute(hItem, 3, 542,  isSpecial ? 0.0 : (hasWarPaint ? 0.0 : setAussie));
 	
 	// Has Festive Override?
 	bool hasFestive = pWeapons[client].Festive[slot], orgFestive = orgWeapons[client][slot].Festive;
