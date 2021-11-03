@@ -13,6 +13,11 @@
 /*
  * Change-Log
  *
+ * 3.1.1 - 03/11/21
+ * General
+ *  - Fixed #12
+ *    - Overlooked ConVar declaration mistake in logic.
+ *
  * 3.1.0 - 02/11/21
  * General
  *  - Implemented search functionality for Unusual effects and War Paints.
