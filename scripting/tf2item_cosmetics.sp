@@ -3,7 +3,7 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define PLUGIN_VERSION "3.1.0"
+#define PLUGIN_VERSION "3.1.1"
 
 public Plugin myinfo = 
 {
@@ -85,20 +85,19 @@ public void OnPluginStart()
 	unusualNames = new ArrayList(64);
 	unusualIds   = new ArrayList();
 	
+	// Run forward to execute ConVar declarations
+	OnConfigsExecuted();
+	
 	// Handle late loading
 	if (bLateLoad) {
-		OnConfigsExecuted();
-		
-		// Register Preference Saving Cookie
-		pPreferences = CV_UseCookies.BoolValue ? RegClientCookie("tf2item_cosmetics_prefs", "Cosmetic override preferences set for this user.", CookieAccess_Private) : INVALID_HANDLE;
-		
 		for (int i = 1; i < MaxClients; i++) {
 			if (IsClientInGame(i) && !IsClientSourceTV(i) && !IsFakeClient(i))
 				OnClientPostAdminCheck(i);
 		}
-	} else
-		// Register Preference Saving Cookie
-		pPreferences = CV_UseCookies.BoolValue ? RegClientCookie("tf2item_cosmetics_prefs", "Cosmetic override preferences set for this user.", CookieAccess_Private) : INVALID_HANDLE;
+	}
+	
+	// Register Preference Saving Cookie
+	pPreferences = CV_UseCookies.BoolValue ? RegClientCookie("tf2item_cosmetics_prefs", "Cosmetic override preferences set for this user.", CookieAccess_Private) : INVALID_HANDLE;
 }
 
 // Hook spawns if the ConVar is on

@@ -3,7 +3,7 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define PLUGIN_VERSION "3.1.0"
+#define PLUGIN_VERSION "3.1.1"
 
 public Plugin myinfo = 
 {
@@ -42,7 +42,7 @@ int clipOff;
 int ammoOff;
 
 // Global Late Loading Value
-bool bLateLoad;
+bool bLateLoad = false;
 
 /////////////////////
 /////////////////////
@@ -87,20 +87,19 @@ public void OnPluginStart() {
 	HookEvent("player_spawn", OnPlayerSpawn);
 	HookEvent("post_inventory_application", OnPlayerSpawn);
 	
+	// Run forward to execute ConVar declarations
+	OnConfigsExecuted();
+	
 	// Late loading reset
 	if (bLateLoad) {
-		OnConfigsExecuted();
-		
-		// Register Preference Saving Cookie
-		pPreferences = CV_UseCookies.BoolValue ? RegClientCookie("tf2item_weapons_prefs", "Weapon override preferences set for this user.", CookieAccess_Private) : INVALID_HANDLE;
-		
 		for (int i = 1; i < MaxClients; i++) {
 			if (IsClientInGame(i) && !IsClientSourceTV(i) && !IsFakeClient(i))
 				OnClientPostAdminCheck(i);
 		}
-	} else
-		// Register Preference Saving Cookie
-		pPreferences = CV_UseCookies.BoolValue ? RegClientCookie("tf2item_weapons_prefs", "Weapon override preferences set for this user.", CookieAccess_Private) : INVALID_HANDLE;
+	}
+	
+	// Register Preference Saving Cookie
+	pPreferences = CV_UseCookies.BoolValue ? RegClientCookie("tf2item_weapons_prefs", "Weapon override preferences set for this user.", CookieAccess_Private) : INVALID_HANDLE;
 }
 
 /* public Action CMD_Test(int client, int args) {
