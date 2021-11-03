@@ -15,7 +15,7 @@
  *
  * 3.1.1 - 03/11/21
  * General
- *  - Fixed #12
+ *  - Fixed #13
  *    - Overlooked ConVar declaration mistake in logic.
  *
  * 3.1.0 - 02/11/21
