@@ -3,7 +3,7 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define PLUGIN_VERSION "3.1.1"
+#define PLUGIN_VERSION "3.1.2"
 
 public Plugin myinfo = 
 {
@@ -102,6 +102,12 @@ public void OnPluginStart()
 
 // Hook spawns if the ConVar is on
 public void OnMapStart() {
+	// Occupy memory
+	if (unusualNames == INVALID_HANDLE)
+		unusualNames = new ArrayList(64);
+	if (unusualIds == INVALID_HANDLE)
+		unusualIds   = new ArrayList();
+	
 	if (CV_OnlySpawn.BoolValue)
 		HookRespawns();
 }
