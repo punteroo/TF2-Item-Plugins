@@ -24,7 +24,7 @@ If you have any doubts or want something else, just write it down on the **Issue
 # TODO
 - [x] Translations, for Spanish and English users.
 - [X] Merge everything to maintain functionality, as one removes the others' effects.
-- [ ] Implement preference saving on **tf2item_cosmetics** and **tf2item_weapons** so selected user effects are applied whenever the user re-joins the server. This would nullify the player from opening the menus again each map change to re-apply said preferences.
+- [X] Implement preference saving on **tf2item_cosmetics** and **tf2item_weapons** so selected user effects are applied whenever the user re-joins the server. This would nullify the player from opening the menus again each map change to re-apply said preferences.
 - [X] Fix Unusual Effects (custom or legit) not being kept after applying a custom paint effect, could probably be permanently fixed when the merge is applied (merge is done).
 - [x] ~~Refresh handles upon re-loading to prevent plugin failing on late-load (reload, refresh or unload and load)~~ Replace all ``Handle``s for ``enum struct``s.
 - [x] Fix a **probably problematic** memory leak when applying Unusual Effects.
