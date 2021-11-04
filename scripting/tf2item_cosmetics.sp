@@ -102,6 +102,12 @@ public void OnPluginStart()
 
 // Hook spawns if the ConVar is on
 public void OnMapStart() {
+	// Occupy memory
+	if (unusualNames == INVALID_HANDLE)
+		unusualNames = new ArrayList(64);
+	if (unusualIds == INVALID_HANDLE)
+		unusualIds   = new ArrayList();
+	
 	if (CV_OnlySpawn.BoolValue)
 		HookRespawns();
 }

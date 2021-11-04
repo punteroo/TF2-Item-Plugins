@@ -127,6 +127,12 @@ public Action CMD_Weapons(int client, int args) {
 }
 
 public void OnMapStart() {
+	// Initialize ArrayLists
+	if (wPaintNames == INVALID_HANDLE)
+		wPaintNames    = new ArrayList(64);
+	if (wPaintProtoDef == INVALID_HANDLE)
+		wPaintProtoDef = new ArrayList();
+	
 	if (CV_OnlySpawn.BoolValue)
 		HookRespawns();
 }
