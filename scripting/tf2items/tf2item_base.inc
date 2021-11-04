@@ -13,6 +13,10 @@
 /*
  * Change-Log
  *
+ * 3.1.2 - 04/11/21
+ * General
+ *  - Fixed ArrayLists not being properly initialized through map changes.
+ *
  * 3.1.1 - 03/11/21
  * General
  *  - Fixed #13
