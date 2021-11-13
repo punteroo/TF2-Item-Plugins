@@ -13,6 +13,12 @@
 /*
  * Change-Log
  *
+ * 3.1.3 - 13/11/21
+ * tf2item_weapons
+ *  - Fixed #16
+ *    - Players with set overrides on any class could mask item indexes to be given weapons they must not equip by disguising.
+ *    - Disguise Weapons would fire TF2Items_OnGiveNamedItem
+ *
  * 3.1.2 - 04/11/21
  * General
  *  - Fixed ArrayLists not being properly initialized through map changes.
