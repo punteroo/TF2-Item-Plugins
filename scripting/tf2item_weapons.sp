@@ -625,6 +625,14 @@ public Action TF2Items_OnGiveNamedItem(int client, char[] classname, int iItemDe
 	// Ignore cosmetic items.
 	if (StrContains(classname, "tf_wearable", false) != -1) return Plugin_Continue;
 	
+	TFClassType class = TF2_GetPlayerClass(client);
+	
+	// Ignore disguise weapons (we do NOT have an entity index here, so we can't check directly for m_bDisguiseWeapon)
+	if (class == TFClass_Spy) {
+		// They're a Spy. Check if this weapon being given corresponds to their class.
+		if (TF2Econ_GetItemLoadoutSlot(iItemDefinitionIndex, class) == -1) return Plugin_Continue;
+	}
+	
 	// Turn the item ID into the strange variant just to be sure.
 	bool changed = StockToStrange(iItemDefinitionIndex);
 	
