@@ -94,6 +94,7 @@ You can now customize the plugin pack's functionality utilizing **ConVars**.
 ConVar | Description | Plugin it Affects | Default Value
 ------ | ----------- | ----------------- | -------------
 tf2items_general_onlyspawn | Restricts players to only be able to utilize any manager inside a spawn region. | **tf2item_cosmetics** & **tf2item_weapons** | 0
+tf2items_save_preferences | Enables the usage of Player Cookies to save overrides between map changes and disconnections. | **tf2item_cosmetics** & **tf2item_weapons** | 1
 tf2items_cosmetics_show_missing_particles | Logs whenever a valid ID for a War Paint or Unusual Effect is tried to be added onto a menu, but fails because of a missing translation phrase. Good to know for updating, but bad because of the spam amount. | **tf2item_cosmetics** & **tf2item_weapons** | 0
 tf2items_cosmetics_unusuals | Toggles the ability for players to utilize Unusual Overrides on their cosmetics. | **tf2item_cosmetics** | 1
 tf2items_cosmetics_paints | Toggles the ability for players to utilize Paint Overrides on their cosmetics. | **tf2item_cosmetics** | 1
