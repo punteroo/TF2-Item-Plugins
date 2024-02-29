@@ -19,7 +19,7 @@ Feel free to use these plugins wherever you want.
 
 **This plugin makes use of the ``m_bValidatedAttachedEntity`` networked property, which bypasses the restriction made by VALVe where fake items are invisible to others. Everyone on the server will be able to see your items with these plugins.**
 
-If you have any doubts or want something else, just write it down on the **Issues** tab or contact me directly through **Discord**. My tag is **puntero#6566**. Enjoy.
+If you have any doubts or want something else, just write it down on the **Issues** tab.
 
 # TODO
 - [x] Translations, for Spanish and English users.
