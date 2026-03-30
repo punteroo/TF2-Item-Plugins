@@ -9,7 +9,7 @@
 #define WeaponSpell_Explosions		   (WeaponSpell_SquashRockets | WeaponSpell_SentryQuadPumpkins | WeaponSpell_GourdGrenades)
 
 /** Local memory copy where client inventories are stored for server use. */
-TFInventory_Weapons_Slot g_inventories[MAXPLAYERS + 1][MAX_CLASSES][MAX_WEAPONS];
+TFInventory_Weapons_Slot g_inventories[MAXPLAYERS + 1][MAX_CLASSES + 1][MAX_WEAPONS + 1];
 
 /** A list of paint kits available for the plugin to use. */
 StringMap				 g_paintKits[MAX_PAINTS];

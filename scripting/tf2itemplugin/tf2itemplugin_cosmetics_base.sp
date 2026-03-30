@@ -28,7 +28,7 @@
 #define MAX_UNUSUAL_EFFECTS	  2048
 
 /** Global variable that keeps track in-memory of user inventories for cosmetic modifications. */
-TFInventory_Cosmetics_Slot g_inventories[MAXPLAYERS + 1][MAX_CLASSES][MAX_COSMETICS];
+TFInventory_Cosmetics_Slot g_inventories[MAXPLAYERS + 1][MAX_CLASSES + 1][MAX_COSMETICS + 1];
 
 // Network prop for weapon clip.
 int						   clipOff;
