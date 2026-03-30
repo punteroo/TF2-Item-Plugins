@@ -2,6 +2,9 @@
 
 A 2024 refresh rewrite for plugins that manage player cosmetics & weapons, along with a provisory **VIP system** menu for servers to use.
 
+> I no longer have the means nor interest to keep this plugin kit alive. I no longer play this game and wish to keep it that way.
+> If someone wishes to maintain this project I suggest forking it. Thank you!
+
 ## TOS & `m_bValidatedAttachedEntity`
 
 Some months ago I started developing private plugins for communities that modify items for the game. It **IS AGAINST TOS**, and I know this can't be released on **AlliedModders** because of such, but because **VALVe** doesn't care for their game and it's been 7 years since a token ban has been issued I'll be releasing these public.
